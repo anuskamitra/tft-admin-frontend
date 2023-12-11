@@ -1,0 +1,22 @@
+
+
+.LeftBar {
+    width:20vw;
+  }
+  
+  .rightContent {
+    margin-top: 20px;
+    flex: 1;
+  
+  } 
+  .nothing{
+    height: 500px;
+    text-shadow: 2;
+    font-size: 40px;
+    color: rgb(225, 221, 221);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+  }

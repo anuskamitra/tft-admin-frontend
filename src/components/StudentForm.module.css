@@ -1,0 +1,25 @@
+.container{
+    position: fixed;
+    top:0;
+    bottom: 0;
+    right: 0;
+    left:0;
+    background-color:rgba(189,189,189,0.5);
+    display:flex
+}
+/* bg-white your-div fixed top-[50%] left-[50%] w-[40rem] h-[30rem] translate-x-[-50%]  translate-y-[-50%] p-3 rounded-md overflow-auto */
+.body{
+    background-color: rgb(255, 255, 255);
+    position: fixed;
+    top:50%;
+    left: 50%;
+    width:35rem ;
+    height:35rem ;
+    padding-left: 3%;
+    padding-right: 3%;
+    overflow: auto;
+    transform: translate(-50%,-50%);
+    border-radius: 3%;
+
+
+}

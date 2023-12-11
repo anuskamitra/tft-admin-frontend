@@ -1,0 +1,29 @@
+*{
+    box-sizing: border-box;
+}
+.container{
+    color:rgb(255, 255, 255);
+    display:flex;
+    flex-direction: column;
+    background-color:  #6593f7;
+    min-height: 100vh;
+    align-items: center;
+    padding-top: 5%;
+   
+}
+.heading{
+    font-size: 30px;
+}
+.list{
+    display:flex;
+    flex-direction: column;
+    font-size: 20px;
+    cursor: pointer;
+    align-items: center;
+}
+.listItem:hover{
+    color:rgb(0, 0, 0)
+}
+hr{
+    width:100%;
+}
