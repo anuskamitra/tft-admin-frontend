@@ -26,15 +26,21 @@ const getStudent=async()=>{
 }
 
     const handleDeleteStudent=async(student)=>{
-        axios.post(backendURL+"/api/delete",student)
-        .then(response=>{
-            if(response.status===200){
-                console.log(response);
-                console.log("deleted");
-                getStudent();
-            }
+        const shouldDelete = window.confirm('Are you sure you want to delete this student?');
+        if(!shouldDelete){
+          return
+        }
+        else{  
+            axios.post(backendURL+"/api/delete",student)
+            .then(response=>{
+                if(response.status===200){
+                    console.log(response);
+                    console.log("deleted");
+                    getStudent();
+                }
            
-        })
+            })
+        }
     }
     const handleUpdateStudent=async(id)=>{
         console.log("student to be updated"+id);
