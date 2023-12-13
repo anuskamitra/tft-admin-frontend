@@ -1,14 +1,16 @@
 *{
     box-sizing: border-box;
+   
 }
 .container{
     color:rgb(255, 255, 255);
     display:flex;
     flex-direction: column;
     background-color:  #6593f7;
-    min-height: 100vh;
+    min-height: 100%;
     align-items: center;
-    padding-top: 5%;
+    width: 20%;
+   position: fixed
    
 }
 .heading{

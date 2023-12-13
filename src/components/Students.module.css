@@ -8,8 +8,17 @@
 .tableContainer {
     display: flex;
     justify-content: center;
-    align-items: center;
     height: 100%;
     margin-left: 5%;
     margin-right: 5%;
+  }
+  .zoomImage {
+    transition: transform 0.3s ease;
+    width: 40px;
+    height: 40px;
+    
+  }
+  
+  .zoomImage:hover {
+    transform: scale(4)
   }

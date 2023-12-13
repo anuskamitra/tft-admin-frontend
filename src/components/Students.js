@@ -6,11 +6,12 @@ import StudentForm from './StudentForm';
 import axios from "axios";
 import Table from 'react-bootstrap/Table';
 
+
 function Students() {
 const[showStudentFrom,setShowStudentForm]=useState(false);
 const[studentList,setStudentList]=useState([]);
 const[updateStudent,setUpdateStudent]=useState(false);
-const[studentDetails,setStudentDetails]=useState({id:"",name:"",email:"",parent:"",college:"",birthDay:"",department:"",address:""})
+const[studentDetails,setStudentDetails]=useState({id:"",name:"",email:"",parent:"",college:"",birthDay:"",department:"",address:"",photo:""})
 const backendURL="http://localhost:8080";
 const getStudent=async()=>{
     try{
@@ -25,7 +26,7 @@ const getStudent=async()=>{
     }
 }
 
-    const handleDeleteStudent=async(student)=>{
+const handleDeleteStudent=async(student)=>{
         const shouldDelete = window.confirm('Are you sure you want to delete this student?');
         if(!shouldDelete){
           return
@@ -46,11 +47,8 @@ const getStudent=async()=>{
         console.log("student to be updated"+id);
         axios.post(backendURL+"/api/fetchStudentToUpdate",{id})
         .then(response=>{
-            console.log(response)
             if(response.status===200){
-                console.log(response.data);
                 const studentInfo=response.data;
-                console.log("_-----------------------_"+studentInfo.College.Name)
                 setUpdateStudent(true);
                 setShowStudentForm(true);
                  setStudentDetails({
@@ -61,7 +59,10 @@ const getStudent=async()=>{
                     college:studentInfo.College._id,
                     collegeName:studentInfo.College.Name,
                     birthDay:studentInfo.Birthday,
-                    department:studentInfo.Department,
+                    department:studentInfo.Department?._id,
+                    prevDepartment:studentInfo.Department?._id,
+                    departmentName:studentInfo.Department?.Name,
+                    photo:studentInfo.Photo
                  })
             }
            
@@ -69,6 +70,7 @@ const getStudent=async()=>{
     }
     useEffect(()=>{
         getStudent();
+        console.log(studentList)
         },[])
   return (
     <div className={Styles.container}> 
@@ -78,9 +80,11 @@ const getStudent=async()=>{
      </div>
      {showStudentFrom && <StudentForm setShowStudentForm={setShowStudentForm} setStudentList={setStudentList} getStudent={getStudent} studentDetails={studentDetails} setStudentDetails={setStudentDetails} updateStudent={updateStudent} setUpdateStudent={setUpdateStudent}/>}
      <div className={Styles.tableContainer}>
+
      <Table striped bordered size="lg">
      <thead>
         <tr>
+           <th>Image</th>
           <th>Name</th>
           <th>Email</th>
           <th>College</th>
@@ -91,13 +95,15 @@ const getStudent=async()=>{
         </tr>
       </thead>
       <tbody>
+        
      {studentList.map((student)=>{
         return (
             <tr key={student.Email}>
+             <td><img className={Styles.zoomImage} src={student.Photo}></img></td>
              <td>{student.Name} </td>
              <td>{student.Email} </td>
-             <td>{student.College.Name} </td>
-             <td>{student.Department}</td>
+             <td>{student.College?.Name} </td>
+             <td>{student.Department?.Name}</td>
              <td>{student.Birthday}</td>
             <td> <Button type="submit" msg="Update" className="btn btn-primary"onClick={()=>handleUpdateStudent(student._id)}/></td>
             <td><Button type="submit" msg="Delete" className="btn btn-danger" onClick={()=>handleDeleteStudent(student)}/></td>
