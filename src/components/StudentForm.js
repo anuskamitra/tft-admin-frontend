@@ -11,6 +11,8 @@ function StudentForm(props) {
   const [pic,setPic]=useState("");
   const [collegeName, setCollegeName] = useState([]);
   const[departmentList,setDepartmentList]=useState([])
+  let selectedCollegeName="";
+  let selectedCollege={};
   const rgExp = /^[a-z0-9._]+@[a-z]+\.[a-z]{2,6}$/;
   const namePattern = /^[a-zA-Z\s]+$/;
  let details={};
@@ -189,9 +191,10 @@ const uploadPic=async()=>{
     });
     props.setUpdateStudent(false);
   };
+  
   useEffect(() => {
     getCollege();
-    getDepartment();
+    // getDepartment();
   }, []);
   return (
     <React.Fragment>
@@ -250,11 +253,16 @@ const uploadPic=async()=>{
           </label>
           <select
             className={`form-select ${error.college && "border border-danger"}`}
-            onChange={(event) =>
+            onChange={(event) =>{
+              selectedCollegeName=event.target.value
+              selectedCollege=collegeName.find(ob=>ob._id===selectedCollegeName)
               props.setStudentDetails({
                 ...props.studentDetails,
                 college: event.target.value,
+                selectedColl:selectedCollege
+
               })
+            }
             }
           >
             <option value={props.studentDetails.college}>
@@ -278,11 +286,12 @@ const uploadPic=async()=>{
               })
             }
           />
+         
             <label className="fw-2">
-            Department name<span style={{ color: "red" }}>*</span>
+            Department name<span  style={{fontSize:"12px", color:"red"}}> (Please first select college to see the available departments)</span>
           </label>
           <select
-            className={`form-select ${error.department && "border border-danger"}`}
+            className={`form-select `}
             onChange={(event) =>
               props.setStudentDetails({
                 ...props.studentDetails,
@@ -290,18 +299,18 @@ const uploadPic=async()=>{
               })
             }
           >
-            <option value={props.studentDetails.department}>
-              {props.studentDetails.departmentName}
+            <option value={props.studentDetails?.department||123}>
+              {props.studentDetails?.departmentName||"Choose a value"}
             </option>
-            {departmentList.map((department) => {
-              return <option value={department._id}>{department.Name}</option>;
+          {props.studentDetails.selectedColl?.Departments?.map((department) => {
+               return <option value={department._id}>{department.Name}</option>;
             })}
-          </select>
-          <p className="text-danger">{error.department}</p>
+            
+          </select> 
 
         {studentExistsError && <p className="fs-5 fw-bold text-center text-danger m-0">{studentExistsError}</p>}
           {props.updateStudent ? (
-            <div className="d-grid">
+            <div className="d-grid mt-2">
               {" "}
               <Button
                 msg="Submit"
@@ -310,7 +319,7 @@ const uploadPic=async()=>{
               />
             </div>
           ) : (
-            <div className="d-grid">
+            <div className="d-grid mt-2">
               <Button
                 msg="Submit"
                 type="submit"

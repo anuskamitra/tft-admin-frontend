@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import InputController from './InputController'
 import Styles from "./StudentForm.module.css"
 import Button from './Button.js'
@@ -10,15 +10,55 @@ function CollegeForm(props) {
     const rgExp=/^[a-z0-9._]+@[a-z]+\.[a-z]{2,6}$/;
     var namePattern = /^[a-zA-Z\s]+$/;
     const [collegeExsistError,setCollegeExistError]=useState("")
+    const [departmentList,setDepartmentList]=useState([])
+    const [selectedDepartments,setSelectedDepartments]=useState([])
+    const [removedDepartments,setremovedDepartments]=useState([])
     const [error,setError]=useState({});
     const clearForm=()=>{
         props.setShowCollegeForm(false);
-        props.setCollegeDetails({Name:"", Email:"",State:"",City:"", Rating:""})     
+        props.setCollegeDetails({Name:"", Email:"",State:"",City:"", Rating:""})    
+        props.setUpdate(false) 
     }
+    const getDepartment=()=>{
+      try{
+          axios.get("http://localhost:8080/department/fetchdepartments")
+          .then(response=>{
+              setDepartmentList(response.data);
+          })
+        }catch(err){
+          console.log(err)
+        }
+  }
+  const handleCheckboxChange=(event)=>{
+    console.log(event.target.value)
+    const departmentId=event.target.value;
+    setSelectedDepartments((prevDepartments)=>{
+      if(prevDepartments?.includes(departmentId)){
+       setremovedDepartments( [...removedDepartments, departmentId])
+        return prevDepartments.filter((id)=>id!==departmentId)
+      }
+      else{
+        setremovedDepartments(prevRemovedDep=>
+          prevRemovedDep? prevRemovedDep.filter((id)=>id!==departmentId):[]
+        )
+        return[...prevDepartments,departmentId]
+      }
+    })
+  }
+  
     const handleSubmitCollegeForm=async(e)=>{
       e.preventDefault();
-      console.log(props.collegeDetails);
-     let validationError=false;
+      setError({})
+      let validationError=false;
+
+      console.log(selectedDepartments)
+      if(selectedDepartments?.length===0){
+        setError((prev) => ({ ...prev, department: "Atleast one department is required!" }));
+          validationError=true;
+      }
+      let details={...props.collegeDetails,departments:selectedDepartments}
+      console.log(details);
+  
         if (props.collegeDetails.Name === "") {
           setError((prev) => ({ ...prev, name: "Name is required!" }));
           validationError=true;
@@ -41,7 +81,7 @@ function CollegeForm(props) {
       if(!validationError){
         setError({})
       try{
-        axios.post("http://localhost:8080/college/addnew",props.collegeDetails)
+        axios.post("http://localhost:8080/college/addnew",details)
         .then(response=>{
               console.log(response.data);
             if(response.data==="alreadyexist"){
@@ -50,7 +90,7 @@ function CollegeForm(props) {
             else{
                 props.setShowCollegeForm(false)
                 props.getCollege();
-                props.setCollegeDetails({Name:"", Email:"",State:"",City:"", Rating:""})
+                props.setCollegeDetails({Name:"", Email:"",State:"",City:"", Rating:"",departments:[]})
             }
         })
       }catch(err){
@@ -60,20 +100,47 @@ function CollegeForm(props) {
   }
     const handleupdateCollegeForm=async(e)=>{
       e.preventDefault();
-      if(!props.collegeDetails.Name||!props.collegeDetails.Email){
-          setError("Please fillup the required details")
+      let validationError=false;
+      setError({})
+      console.log(selectedDepartments)
+      if(selectedDepartments.length===0){
+        console.log("hi")
+        validationError=true;
+        setError((prev) => ({ ...prev, department: "Atleast one department is required!" }));
+         
       }
-      else  if(!rgExp.test(props.collegeDetails.Email)) {
-          setError("Email is not valid!");
-        }
-      else{
+      let details={...props.collegeDetails,Departments:selectedDepartments,RemovedDepartments:removedDepartments}
+      console.log(details);
+      if (props.collegeDetails.Name === "") {
+        setError((prev) => ({ ...prev, name: "Name is required!" }));
+        validationError=true;
+      } 
+      else if (!namePattern.test(props.collegeDetails.Name)) {
+        setError((prev) => ({ ...prev, name: "Name is not valid!" }));
+        validationError=true;  
+      }
+      if (props.collegeDetails.State === "") {
+        setError((prev) => ({ ...prev, state: "State is required!" }));
+        validationError=true
+      }
+      if (props.collegeDetails.Email === "") {
+        setError((prev) => ({ ...prev, email: "Email is required!" }));
+        validationError=true
+      } else if (!rgExp.test(props.collegeDetails.Email)) {
+        setError((prev) => ({ ...prev, email: "Email is not valid!" }));
+        validationError=true
+      } 
+     
+      if(!validationError){
+        setError({})
       try{
         props.setShowCollegeForm(false) 
-       axios.post("http://localhost:8080/college/update",props.collegeDetails)
+        props.setUpdate(false);
+       axios.post("http://localhost:8080/college/update",details)
        .then(response=>{
           console.log(response);
           props.getCollege();
-          props.setCollegeDetails({id:"",Name:"", State:"",City:"", Rating:""})
+          props.setCollegeDetails({id:"",Name:"", State:"",City:"", Rating:"",Departments:""})
           props.setUpdate(false);
        })
       }catch(err){
@@ -82,6 +149,11 @@ function CollegeForm(props) {
     }
   
 }
+
+useEffect(()=>{
+  getDepartment()
+  setSelectedDepartments(props.collegeDetails.Departments)
+},[])
   return (
     <React.Fragment>
     <div className={Styles.container}onClick={clearForm} ></div>
@@ -93,7 +165,20 @@ function CollegeForm(props) {
             <InputController label="Email" type="email" error={error.email} req={true} name="email" placeholder="example@gmail.com" value={props.collegeDetails.Email} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,Email:event.target.value})}/>
             <InputController label="State" req={true} error={error.state} placeholder="State" name="state" value={props.collegeDetails.State} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,State:event.target.value})} />
             <InputController label="City" type="text" placeholder="City" name="city" value={props.collegeDetails.City} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,City:event.target.value})} />
+            <label className="fw-2">
+            Department name
+          </label>
+          <div>
+            {departmentList.map((department) => (
+              <div key={department.Name}>
+             <input type="checkbox" id={department._id} value={department._id}  onChange={handleCheckboxChange}  checked={selectedDepartments?.includes(department._id)}/>
+            <label htmlFor={department.Name}>{department.Name}</label> 
+            </div>       
+            ))}
+             <p className="text-danger">{error.department}</p>
+           </div>
             <InputController label="Rating" type="number"  name="rating" placeholder="Department" value={props.collegeDetails.Rating} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,Rating:event.target.value})}/>
+
             {collegeExsistError && <p className="fs-5 fw-bold text-center text-danger mb-2">{collegeExsistError}</p>}
              <div className='d-grid'>{props.update?<Button msg="Update" type="submit" onClick={handleupdateCollegeForm}/>:<Button msg="Submit" type="submit" onClick={handleSubmitCollegeForm}/>} </div> 
         </form>

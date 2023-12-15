@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Table from "react-bootstrap/Table";
 import axios from "axios";
 
 function Summary() {
-  const [studentList, setStudentList] = useState([]);
-  const [collegeList, setCollegeList] = useState([]);
+  const [studentListLength, setStudentListLength] = useState();
+  const [collegeListLength, setCollegeListLength] = useState();
+  const [ departmentListLength, setDepartmentListLength]=useState();
+
   const getStudent = async () => {
     try {
       axios.get("http://localhost:8080/api/fetchStudents").then((response) => {
-        const data = response.data;
-        setStudentList(data);
+        const data = response.data.length;;
+         setStudentListLength(data);
       });
     } catch (err) {
       console.log(err);
@@ -20,63 +21,39 @@ function Summary() {
       axios
         .get("http://localhost:8080/college/fetchcolleges")
         .then((response) => {
-          setCollegeList(response.data);
+          setCollegeListLength(response.data.length);
         });
     } catch (err) {
       console.log(err);
     }
   };
+  const getDepartment=()=>{
+    try{
+        axios.get("http://localhost:8080/department/fetchdepartments")
+        .then(response=>{
+            setDepartmentListLength(response.data.length);
+        })
+      }catch(err){
+        console.log(err)
+      }
+}
   useEffect(() => {
     getStudent();
     getCollege();
+    getDepartment()
   }, []);
   return (
     <React.Fragment>
-      <div className="d-flex flex-row justify-content-around align-items-center">
+      <div className="d-flex flex-column justify-content-around align-items-center">
+        <h2>Summary</h2><br/><br/><br/>
         <div>
-          <h3 className="text-center">Student List</h3>
-          <Table striped bordered >
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>College</th>
-                <th>Department</th>
-              </tr>
-            </thead>
-            <tbody>
-              {studentList.map((student) => {
-                return (
-                  <tr key={student.Email}>
-                    <td>{student.Name}</td>
-                    <td>{student.College?.Name}</td>
-                    <td>{student.Department?.Name}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
+      <p className="fs-3 "> Number of Students in the Student List : {studentListLength} </p>
         </div>
-
         <div>
-          <h3 className="text-center">College List</h3>
-          <Table striped bordered>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {collegeList.map((college) => {
-                return (
-                  <tr key={college.Email}>
-                    <td>{college.Name}</td>
-                    <td>{college.State}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </Table>
+       <p className="fs-3 ">Number of Colleges in the Colleg List : {collegeListLength}</p> 
+        </div>
+        <div>
+        <p className="fs-3 ">   Number of Departments in the Department List : {departmentListLength}</p> 
         </div>
       </div>
     </React.Fragment>

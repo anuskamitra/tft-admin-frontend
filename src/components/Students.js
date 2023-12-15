@@ -10,8 +10,9 @@ import Table from 'react-bootstrap/Table';
 function Students() {
 const[showStudentFrom,setShowStudentForm]=useState(false);
 const[studentList,setStudentList]=useState([]);
+const[collegeList,setCollegeList]=useState([])
 const[updateStudent,setUpdateStudent]=useState(false);
-const[studentDetails,setStudentDetails]=useState({id:"",name:"",email:"",parent:"",college:"",birthDay:"",department:"",address:"",photo:""})
+const[studentDetails,setStudentDetails]=useState({id:"",name:"",email:"",parent:"",college:"",birthDay:"",department:null,address:"",photo:"",selectedColl:{}})
 const backendURL="http://localhost:8080";
 const getStudent=async()=>{
     try{
@@ -25,7 +26,18 @@ const getStudent=async()=>{
         console.log(err);
     }
 }
-
+const getCollege = () => {
+    try {
+      axios
+        .get("http://localhost:8080/college/fetchcolleges")
+        .then((response) => {
+          console.log(response);
+          setCollegeList(response.data);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 const handleDeleteStudent=async(student)=>{
         const shouldDelete = window.confirm('Are you sure you want to delete this student?');
         if(!shouldDelete){
@@ -49,6 +61,9 @@ const handleDeleteStudent=async(student)=>{
         .then(response=>{
             if(response.status===200){
                 const studentInfo=response.data;
+                console.log(studentInfo.College._id)
+                let selectedCollege=collegeList.find(ob=>ob._id===studentInfo.College._id)
+                
                 setUpdateStudent(true);
                 setShowStudentForm(true);
                  setStudentDetails({
@@ -62,7 +77,8 @@ const handleDeleteStudent=async(student)=>{
                     department:studentInfo.Department?._id,
                     prevDepartment:studentInfo.Department?._id,
                     departmentName:studentInfo.Department?.Name,
-                    photo:studentInfo.Photo
+                    photo:studentInfo.Photo,
+                    selectedColl:selectedCollege
                  })
             }
            
@@ -70,7 +86,7 @@ const handleDeleteStudent=async(student)=>{
     }
     useEffect(()=>{
         getStudent();
-        console.log(studentList)
+        getCollege()
         },[])
   return (
     <div className={Styles.container}> 

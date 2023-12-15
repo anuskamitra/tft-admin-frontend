@@ -10,7 +10,7 @@ export default function CollegeList() {
     const [collegeList,setCollegeList]=useState([]);
     const [update,setUpdate]=useState(false);
     const [showCollegeForm,setShowCollegeForm]=useState(false);
-    const [collegeDetails,setCollegeDetails]=useState({id:"",Name:"", Email:"",State:"",City:"", Rating:""})
+    const [collegeDetails,setCollegeDetails]=useState({id:"",Name:"", Email:"",State:"",City:"", Rating:"",Departments:[]})
     const getCollege=()=>{ 
   try{
     axios.get("http://localhost:8080/college/fetchcolleges")
@@ -45,6 +45,7 @@ const handleUpdateCollege=(id)=>{
         Email:response.data.Email,
         State:response.data.State,
         City:response.data.City, 
+        Departments:response.data.Departments,
         Rating:response.data.Rating
         }
         setCollegeDetails(college);
@@ -67,7 +68,8 @@ useEffect(()=>{
           <th>Name</th>
           <th>Email</th>
           <th>State</th>
-          <th>City</th>
+          <th>City</th> 
+          <th>Departments</th>
           <th>Ratings</th>
           <th>Update</th>
           <th>Delete</th>
@@ -81,6 +83,10 @@ useEffect(()=>{
                 <td>{college.Email}</td>
                 <td>{college.State}</td>
                 <td>{college.City}</td>
+                <td>{college.Departments.map((dep=>{
+                 return <ul className="list-unstyled">
+                  <li className='decoration-none'>{dep.Name}</li></ul>
+                }))}</td>
                 <td>{college.Rating}</td>
                 <td> <Button type="submit" msg="Update" className="btn btn-primary"onClick={()=>handleUpdateCollege(college._id)}/></td>
             <td><Button type="submit" msg="Delete" className="btn btn-danger" onClick={()=>handleDeleteCollege(college)}/></td>

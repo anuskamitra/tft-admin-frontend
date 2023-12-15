@@ -1,16 +1,19 @@
 
 
 .LeftBar {
-    width:20vw;
-  }
+    width:17%;
+    height: 100%;
+    background-color:  #6593f7;
+    position: fixed;
+  } 
   
   .rightContent {
     margin-top: 20px;
-    flex: 1;
-  
-  } 
+    flex: 1; 
+    margin-left: 15vw;
+  }  
   .nothing{
-    height: 500px;
+    height: 30rem;
     text-shadow: 2;
     font-size: 40px;
     color: rgb(225, 221, 221);
@@ -19,4 +22,14 @@
     align-items: center;
     justify-content: center;
 
+  }
+
+  @media only screen and (max-width: 1120px) {
+    .LeftBar {
+      width:10%;
+      height: 100%;
+      background-color:  #6593f7;
+      position: fixed;
+    } 
+    
   }
