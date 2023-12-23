@@ -18,12 +18,23 @@ function StudentForm(props) {
  let details={};
   const getCollege = () => {
     try {
+      if(props.typeOfUser.type==="College"){
+        const collegeId=props.typeOfUser.id
+        axios.post("http://localhost:8080/college/fetchonecollege",{collegeId})
+        .then(response=>{
+          let data=response.data;
+          props.setStudentDetails({...props.studentDetails,selectedColl:data})
+        })
+      }
+      else{
       axios
         .get("http://localhost:8080/college/fetchcolleges")
         .then((response) => {
           console.log(response);
           setCollegeName(response.data);
+          
         });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -68,6 +79,8 @@ const uploadPic=async()=>{
 }
   const handleSubmitStudentFrom = async(e) => {
     e.preventDefault();
+    console.log(props.studentDetails)
+    console.log(error)
     setError({});
     let validationError=false;
     
@@ -84,10 +97,13 @@ const uploadPic=async()=>{
       
     }
     if (props.studentDetails.college === "") {
-      console.log("Invalid Name:"+ props.studentDetails.name);
       setError((prev) => ({ ...prev, college: "College is required!" }));
       validationError=true;
      
+    }
+    if (props.studentDetails.department === "") {
+      setError((prev) => ({ ...prev, department: "Department is required!" }));
+      validationError=true;  
     }
     if (props.studentDetails.email === "") {
       setError((prev) => ({ ...prev, email: "Email is required!" }));
@@ -98,10 +114,8 @@ const uploadPic=async()=>{
       validationError=true;
     } 
     if(!validationError){
-      setError({});
-     
+      setError({});  
       try {
-
         await uploadPic();
         console.log(details);
         axios
@@ -112,9 +126,7 @@ const uploadPic=async()=>{
               setStudentExistsError("Student already in the list");
             } else {
               clearForm()
-              props.getStudent();
-
-             
+              props.getStudent();   
             }
           });
       } catch (err) {
@@ -193,14 +205,15 @@ const uploadPic=async()=>{
   };
   
   useEffect(() => {
+    console.log(props.studentDetails)
     getCollege();
-    // getDepartment();
+
   }, []);
+ 
   return (
     <React.Fragment>
       <div className={Styles.container} onClick={clearForm}></div>
-
-      <div className={Styles.body}>
+      <div className={`${Styles.body} your-div`}>
         <h3 className="text-center pt-3">
           {props.updateStudent ? "Update the Student" : "Add a Student"}
         </h3>
@@ -213,7 +226,12 @@ const uploadPic=async()=>{
            onChange={(event) =>
             setPic(event.target.files[0])
           }
+          
           />
+          {/* <div>
+      <label>Previous Photo:</label>
+      <input type="text" readOnly value={props.studentDetails.photo} /> */}
+    {/* </div> */}
 
           <InputController
             label="Name of the Student"
@@ -248,31 +266,34 @@ const uploadPic=async()=>{
             }
           />
 
-          <label className="fw-2">
-            College/University name<span style={{ color: "red" }}>*</span>
-          </label>
-          <select
-            className={`form-select ${error.college && "border border-danger"}`}
-            onChange={(event) =>{
-              selectedCollegeName=event.target.value
-              selectedCollege=collegeName.find(ob=>ob._id===selectedCollegeName)
-              props.setStudentDetails({
-                ...props.studentDetails,
-                college: event.target.value,
-                selectedColl:selectedCollege
+        {props.typeOfUser.type==="College"? 
+        ""
+            :<div><label className="fw-2">
+             College/University name<span style={{ color: "red" }}>*</span>
+           </label>
+           <select
+             className={`form-select ${error.college && "border border-danger"}`}
+             onChange={(event) =>{
+               selectedCollegeName=event.target.value
+               selectedCollege=collegeName.find(ob=>ob._id===selectedCollegeName)
+               props.setStudentDetails({
+                 ...props.studentDetails,
+                 college: event.target.value,
+                 selectedColl:selectedCollege
 
-              })
-            }
-            }
-          >
-            <option value={props.studentDetails.college}>
-              {props.studentDetails.collegeName}
-            </option>
-            {collegeName.map((college) => {
-              return <option value={college._id}>{college.Name}</option>;
-            })}
-          </select>
-          <p className="text-danger">{error.college}</p>
+               })
+             }
+             }
+           >
+             <option value={props.studentDetails.college}>
+               {props.studentDetails.collegeName}
+             </option>
+             {collegeName.map((college) => {
+               return <option value={college._id}>{college.Name}</option>;
+             })}
+           </select>
+           <p className="text-danger">{error.college}</p> </div>}
+      
 
           <InputController
             label="Date Of birth"
@@ -288,10 +309,10 @@ const uploadPic=async()=>{
           />
          
             <label className="fw-2">
-            Department name<span  style={{fontSize:"12px", color:"red"}}> (Please first select college to see the available departments)</span>
+            Department name<span style={{ color: "red" }}>*</span>{ props.typeOfUser.type!=="College"  && <span  style={{fontSize:"12px", color:"red"}}> (Please first select college to see the available departments)</span>}
           </label>
           <select
-            className={`form-select `}
+            className={`form-select ${error.department && "border border-danger"}`}
             onChange={(event) =>
               props.setStudentDetails({
                 ...props.studentDetails,
@@ -299,7 +320,7 @@ const uploadPic=async()=>{
               })
             }
           >
-            <option value={props.studentDetails?.department||123}>
+            <option value={props.studentDetails?.department}>
               {props.studentDetails?.departmentName||"Choose a value"}
             </option>
           {props.studentDetails.selectedColl?.Departments?.map((department) => {
@@ -307,6 +328,7 @@ const uploadPic=async()=>{
             })}
             
           </select> 
+          <p className="text-danger">{error.department}</p>
 
         {studentExistsError && <p className="fs-5 fw-bold text-center text-danger m-0">{studentExistsError}</p>}
           {props.updateStudent ? (

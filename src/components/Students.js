@@ -7,37 +7,56 @@ import axios from "axios";
 import Table from 'react-bootstrap/Table';
 
 
-function Students() {
+function Students(props) {
 const[showStudentFrom,setShowStudentForm]=useState(false);
 const[studentList,setStudentList]=useState([]);
 const[collegeList,setCollegeList]=useState([])
 const[updateStudent,setUpdateStudent]=useState(false);
-const[studentDetails,setStudentDetails]=useState({id:"",name:"",email:"",parent:"",college:"",birthDay:"",department:null,address:"",photo:"",selectedColl:{}})
+const typeOfUser= props.typeOfUser;
+const[studentDetails,setStudentDetails]=useState({
+  id:"",name:"",email:"",parent:"",college:typeOfUser.type==="College"?typeOfUser.id:"",birthDay:"",department:null,address:"",photo:"",selectedColl:{}})
 const backendURL="http://localhost:8080";
+
 const getStudent=async()=>{
+  if(props.typeOfUser.type==="College"){
     try{
-        axios.get("http://localhost:8080/api/fetchStudents")
-        .then(response=>{
-            const data=response.data;
-            setStudentList(data);       
-        })
-    }
-    catch(err){
-        console.log(err);
-    }
+      const collegeId=props.typeOfUser.id;
+      
+      axios.post("http://localhost:8080/api/fetchStudents",{collegeId})
+      .then(response=>{
+          const data=response.data;
+        
+          setStudentList(data);       
+      })
+  }
+  catch(err){
+    console.log(err);
+  }
+  }
+  else{
+    try{
+      axios.get("http://localhost:8080/api/fetchStudents")
+      .then(response=>{
+          const data=response.data;
+          setStudentList(data);       
+      })
+  }
+  catch(err){
+      console.log(err);
+  }
+  }  
 }
 const getCollege = () => {
     try {
       axios
         .get("http://localhost:8080/college/fetchcolleges")
         .then((response) => {
-          console.log(response);
           setCollegeList(response.data);
         });
     } catch (err) {
       console.log(err);
-    }
-  };
+    } 
+  }
 const handleDeleteStudent=async(student)=>{
         const shouldDelete = window.confirm('Are you sure you want to delete this student?');
         if(!shouldDelete){
@@ -55,7 +74,7 @@ const handleDeleteStudent=async(student)=>{
             })
         }
     }
-    const handleUpdateStudent=async(id)=>{
+const handleUpdateStudent=async(id)=>{
         console.log("student to be updated"+id);
         axios.post(backendURL+"/api/fetchStudentToUpdate",{id})
         .then(response=>{
@@ -84,17 +103,18 @@ const handleDeleteStudent=async(student)=>{
            
         })
     }
-    useEffect(()=>{
+useEffect(()=>{
         getStudent();
-        getCollege()
-        },[])
+        getCollege();
+    },[])
+
   return (
     <div className={Styles.container}> 
     <h2 className='text-center'> Students List</h2>
      <div>
      <p className="mt-2 text-center text-success">To add a new Student  <Button className="btn btn-success" msg="Add" type="submit" onClick={()=>setShowStudentForm(true)}/></p>
      </div>
-     {showStudentFrom && <StudentForm setShowStudentForm={setShowStudentForm} setStudentList={setStudentList} getStudent={getStudent} studentDetails={studentDetails} setStudentDetails={setStudentDetails} updateStudent={updateStudent} setUpdateStudent={setUpdateStudent}/>}
+     {showStudentFrom && <StudentForm typeOfUser={typeOfUser} setShowStudentForm={setShowStudentForm} setStudentList={setStudentList} getStudent={getStudent} studentDetails={studentDetails} setStudentDetails={setStudentDetails} updateStudent={updateStudent} setUpdateStudent={setUpdateStudent}/>}
      <div className={Styles.tableContainer}>
 
      <Table striped bordered size="lg">
@@ -103,7 +123,7 @@ const handleDeleteStudent=async(student)=>{
            <th>Image</th>
           <th>Name</th>
           <th>Email</th>
-          <th>College</th>
+         {typeOfUser.type!=="College" &&<th>College</th>}
           <th>Department</th>
           <th>Birthday</th>
           <th>Update</th>
@@ -118,7 +138,7 @@ const handleDeleteStudent=async(student)=>{
              <td><img className={Styles.zoomImage} src={student.Photo}></img></td>
              <td>{student.Name} </td>
              <td>{student.Email} </td>
-             <td>{student.College?.Name} </td>
+             {typeOfUser.type!=="College" && <td>{student.College?.Name} </td>}
              <td>{student.Department?.Name}</td>
              <td>{student.Birthday}</td>
             <td> <Button type="submit" msg="Update" className="btn btn-primary"onClick={()=>handleUpdateStudent(student._id)}/></td>

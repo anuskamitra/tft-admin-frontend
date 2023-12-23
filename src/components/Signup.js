@@ -1,12 +1,20 @@
 import React from "react";
 import InputController from "./InputController";
 import Button from "./Button";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 function Signup() {
   const Navigate = useNavigate();
+
+  useEffect(()=>{
+     const user=JSON.parse(localStorage.getItem("userInfo"));
+     if(user){
+        Navigate("/home");
+     }
+  },[])
+
   const [userDetails, setUserDetails] = useState({
     name: "",
     email: "",

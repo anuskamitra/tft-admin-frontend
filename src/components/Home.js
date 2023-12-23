@@ -9,10 +9,16 @@ import DepartmentList from "./DepartmentList"
 import Summary from "./Summary";
 function Home(){
    const Navigate=useNavigate();
+   const[typeOfUser,setTypeOfUser]=useState({type:"",email:"",id:""});
    useEffect(()=>{
       const user=JSON.parse(localStorage.getItem("userInfo"));
       if(!user){
          Navigate("/");
+      }
+      else{
+         if(user.typeOfUser==="College"){
+            setTypeOfUser({type:user.typeOfUser,email:user.email,id:user._id});
+         }
       }
    },[])
    const[showStudentList,setShowStudentList]=useState(false);
@@ -23,12 +29,12 @@ function Home(){
    <React.Fragment>
       <div className="d-flex">
     <div className={Styles.LeftBar}>
-    <LeftBar showStudentList={showStudentList} setShowStudentList={setShowStudentList} showCollegeList={showCollegeList} setShowCollegeList={setShowCollegeList} setShowDepartmentList={setShowDepartmentList} showDepartmentList={showDepartmentList} setShowSummaryList={setShowSummaryList} showSummaryList={showSummaryList}/></div>
+    <LeftBar showStudentList={showStudentList} setShowStudentList={setShowStudentList} showCollegeList={showCollegeList} setShowCollegeList={setShowCollegeList} setShowDepartmentList={setShowDepartmentList} showDepartmentList={showDepartmentList} setShowSummaryList={setShowSummaryList} showSummaryList={showSummaryList} typeOfUser={typeOfUser}/></div>
     <div className={Styles.rightContent} > 
-     {showStudentList ?<Students/>:
+     {showStudentList ?<Students typeOfUser={typeOfUser}/>:
      showCollegeList?<CollegeList/>:
-     showDepartmentList?<DepartmentList/>:
-     showSummaryList?<Summary/>:
+     showDepartmentList?<DepartmentList typeOfUser={typeOfUser}/>:
+     showSummaryList?<Summary typeOfUser={typeOfUser}/>:
      <div className={Styles.nothing}>
       <p>Choose a list from</p>
       <p>the modules to </p>

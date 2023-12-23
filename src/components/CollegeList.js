@@ -4,13 +4,13 @@ import Button from "./Button.js"
 import axios from "axios"
 import Styles from "./Students.module.css"
 import CollegeForm from './CollegeForm.js';
-// https://youtube.com/shorts/1s1vy8PoQOY?si=3YMiITF2YMqM_NOc
+
 
 export default function CollegeList() {
     const [collegeList,setCollegeList]=useState([]);
     const [update,setUpdate]=useState(false);
     const [showCollegeForm,setShowCollegeForm]=useState(false);
-    const [collegeDetails,setCollegeDetails]=useState({id:"",Name:"", Email:"",State:"",City:"", Rating:"",Departments:[]})
+    const [collegeDetails,setCollegeDetails]=useState({id:"",Name:"", Email:"",Password:"",State:"",City:"", Rating:"",Departments:[]})
     const getCollege=()=>{ 
   try{
     axios.get("http://localhost:8080/college/fetchcolleges")
@@ -46,7 +46,8 @@ const handleUpdateCollege=(id)=>{
         State:response.data.State,
         City:response.data.City, 
         Departments:response.data.Departments,
-        Rating:response.data.Rating
+        Rating:response.data.Rating,
+        Password:response.data.Password
         }
         setCollegeDetails(college);
         setShowCollegeForm(true);

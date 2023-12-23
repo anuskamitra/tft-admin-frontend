@@ -63,6 +63,10 @@ function CollegeForm(props) {
           setError((prev) => ({ ...prev, name: "Name is required!" }));
           validationError=true;
         } 
+        if (props.collegeDetails.Password === "") {
+          setError((prev) => ({ ...prev, password: "Password is required!" }));
+          validationError=true;
+        } 
         else if (!namePattern.test(props.collegeDetails.Name)) {
           setError((prev) => ({ ...prev, name: "Name is not valid!" }));
           validationError=true;  
@@ -90,7 +94,7 @@ function CollegeForm(props) {
             else{
                 props.setShowCollegeForm(false)
                 props.getCollege();
-                props.setCollegeDetails({Name:"", Email:"",State:"",City:"", Rating:"",departments:[]})
+                props.setCollegeDetails({Name:"",Password:"",Email:"",State:"",City:"", Rating:"",departments:[]})
             }
         })
       }catch(err){
@@ -104,7 +108,6 @@ function CollegeForm(props) {
       setError({})
       console.log(selectedDepartments)
       if(selectedDepartments.length===0){
-        console.log("hi")
         validationError=true;
         setError((prev) => ({ ...prev, department: "Atleast one department is required!" }));
          
@@ -119,6 +122,10 @@ function CollegeForm(props) {
         setError((prev) => ({ ...prev, name: "Name is not valid!" }));
         validationError=true;  
       }
+      if (props.collegeDetails.Password === "") {
+        setError((prev) => ({ ...prev, password: "Password is required!" }));
+        validationError=true;
+      } 
       if (props.collegeDetails.State === "") {
         setError((prev) => ({ ...prev, state: "State is required!" }));
         validationError=true
@@ -136,11 +143,12 @@ function CollegeForm(props) {
       try{
         props.setShowCollegeForm(false) 
         props.setUpdate(false);
+        console.log(details)
        axios.post("http://localhost:8080/college/update",details)
        .then(response=>{
           console.log(response);
           props.getCollege();
-          props.setCollegeDetails({id:"",Name:"", State:"",City:"", Rating:"",Departments:""})
+          props.setCollegeDetails({id:"",Name:"", State:"",City:"", Rating:"",Departments:"",Password:""})
           props.setUpdate(false);
        })
       }catch(err){
@@ -152,17 +160,19 @@ function CollegeForm(props) {
 
 useEffect(()=>{
   getDepartment()
+  console.log(props.collegeDetails)
   setSelectedDepartments(props.collegeDetails.Departments)
 },[])
   return (
     <React.Fragment>
     <div className={Styles.container}onClick={clearForm} ></div>
 
-    <div className={Styles.body}>
+    <div className={`${Styles.body} your-div`}>
         <h3 className='text-center pt-3'>{props.update?"Update the college":"Add a college"}</h3> 
         <form className='mt-2'>
             <InputController label="Name of the College" error={error.name} req={true} type="text" placeholder="Enter the college name" name="name" value={props.collegeDetails.Name} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,Name:event.target.value})}/>
             <InputController label="Email" type="email" error={error.email} req={true} name="email" placeholder="example@gmail.com" value={props.collegeDetails.Email} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,Email:event.target.value})}/>
+            <InputController label="Password" type="password" req={true} error={error.password} name="password" placeholder="Password" value={props.collegeDetails.Password} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,Password:event.target.value})}/>
             <InputController label="State" req={true} error={error.state} placeholder="State" name="state" value={props.collegeDetails.State} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,State:event.target.value})} />
             <InputController label="City" type="text" placeholder="City" name="city" value={props.collegeDetails.City} onChange={(event)=>props.setCollegeDetails({...props.collegeDetails,City:event.target.value})} />
             <label className="fw-2">

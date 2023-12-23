@@ -8,10 +8,26 @@ export default function DepartmentForm(props) {
  
   const [error, setError] = useState({});
   const[departmentExisitsError,setDepartmentExisitsError]=useState("");
+  const [departmentList,setDepartmentList]=useState([])
+  const [showInput,setShowInput]=useState(false)
   const namePattern = /^[a-zA-Z\s]+$/;
  
+  const getDepartment=()=>{
+      try{
+        axios.get("http://localhost:8080/department/fetchdepartments")
+        .then(response=>{
+            setDepartmentList(response.data);
+        })
+      }catch(err){
+        console.log(err)
+      }
+  }
+
+
   const handleSubmitDepartmentFrom = (e) => {
+
     e.preventDefault();
+    console.log(props.departmentDetails)
     setError({});
     let validationError=false;
 
@@ -28,11 +44,31 @@ export default function DepartmentForm(props) {
     }
     if(!validationError){
       setError({});
+      if(props.typeOfUser.type==="College"){
+        const details={...props.departmentDetails,id:props.typeOfUser.id}
+        try{
+        axios.post("http://localhost:8080/college/department/addnew",details)
+          .then(response=>{
+            console.log(response.data)
+            props.getDepartment();
+            props.setShowDepartmentForm(false);
+            props.setDepartmentDetails({
+              id: "",
+              Name: "",
+            });
+          })
+        
+      }
+      catch(err){
+        console.log(err);
+      }
+    }
+      else{
       try {
         axios
           .post("http://localhost:8080/department/addnew", props.departmentDetails)
           .then((response) => {
-            console.log(response.data);
+            // console.log(response.data);
             if (response.data === "DepartmentFound") {
               setDepartmentExisitsError("Department already in the list");
             } else {
@@ -49,7 +85,8 @@ export default function DepartmentForm(props) {
         console.log("data not stored");
       }
     }
-  };
+  }
+}
   const handleUpdateDepartmentFrom = (e) => {
     e.preventDefault();
     setError({});
@@ -91,6 +128,13 @@ export default function DepartmentForm(props) {
     });
     props.setUpdate(false);
   };
+  useEffect(()=>{
+    getDepartment();
+  },[])
+  useEffect(()=>{
+    console.log(props.departmentDetails)
+    console.log(showInput)
+  },[props.departmentDetails])
   return (
     <React.Fragment>
       <div className={Styles.container} onClick={clearForm}></div>
@@ -99,7 +143,17 @@ export default function DepartmentForm(props) {
           {props.update ? "Update the Department" : "Add a Department"}
         </h3>
         <form className="mt-2">
-          <InputController
+        {props.typeOfUser.type==="College" ?
+        
+        <select  className={`form-select mb-3`} onChange={(event)=>props.setDepartmentDetails({...props.departmentDetails, Name: event.target.value})}>
+            {departmentList.map((department=>(
+             
+              <option>{department.Name}</option>
+    
+            )))}
+          </select>
+          :
+         <InputController
             label="Name of the department"
             error={error.name}
             req={true}
@@ -113,7 +167,9 @@ export default function DepartmentForm(props) {
                 Name: event.target.value,
               })
             }
-          />
+          />}
+          
+          
         {departmentExisitsError && <p className="fs-5 fw-bold text-center text-danger m-0">{departmentExisitsError}</p>}
           {props.update ? (
             <div className="d-grid">

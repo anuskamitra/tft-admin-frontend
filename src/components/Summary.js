@@ -1,12 +1,24 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function Summary() {
+function Summary(props) {
   const [studentListLength, setStudentListLength] = useState();
   const [collegeListLength, setCollegeListLength] = useState();
   const [ departmentListLength, setDepartmentListLength]=useState();
-
+ const typeOfUser=props.typeOfUser.type
   const getStudent = async () => {
+    if(typeOfUser==="College"){
+      const collegeId=props.typeOfUser.id;
+      try{
+        axios.post("http://localhost:8080/api/countStudents",{collegeId}).then(response=>{
+          const data=response.data.count;
+          setStudentListLength(data);
+        })
+      }catch(err){
+        console.log(err);
+      }
+    }
+    else{
     try {
       axios.get("http://localhost:8080/api/fetchStudents").then((response) => {
         const data = response.data.length;;
@@ -15,7 +27,8 @@ function Summary() {
     } catch (err) {
       console.log(err);
     }
-  };
+  }
+}
   const getCollege = () => {
     try {
       axios
@@ -28,6 +41,19 @@ function Summary() {
     }
   };
   const getDepartment=()=>{
+    if(typeOfUser==="College"){
+      const collegeId=props.typeOfUser.id;
+      try{
+        axios.post("http://localhost:8080/college/fetchdepartments",{collegeId})
+        .then(response=>{
+          setDepartmentListLength(response.data.length);
+        })
+      }catch(err){
+        console.log(err)
+      }
+    }
+    else{
+
     try{
         axios.get("http://localhost:8080/department/fetchdepartments")
         .then(response=>{
@@ -36,6 +62,7 @@ function Summary() {
       }catch(err){
         console.log(err)
       }
+    }
 }
   useEffect(() => {
     getStudent();
@@ -49,9 +76,9 @@ function Summary() {
         <div>
       <p className="fs-3 "> Number of Students in the Student List : {studentListLength} </p>
         </div>
-        <div>
+      {props.typeOfUser.type!=="College" &&  <div>
        <p className="fs-3 ">Number of Colleges in the Colleg List : {collegeListLength}</p> 
-        </div>
+        </div>}
         <div>
         <p className="fs-3 ">   Number of Departments in the Department List : {departmentListLength}</p> 
         </div>
