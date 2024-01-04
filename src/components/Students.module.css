@@ -12,6 +12,14 @@
     margin-left: 5%;
     margin-right: 5%;
   }
+
+  .resultContainer {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    margin-left: 15%;
+    margin-right: 15%;
+  }
   .zoomImage {
     transition: transform 0.3s ease;
     width: 40px;

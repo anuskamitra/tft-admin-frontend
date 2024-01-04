@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import Card from "./Card"
 
 function Summary(props) {
   const [studentListLength, setStudentListLength] = useState();
   const [collegeListLength, setCollegeListLength] = useState();
   const [ departmentListLength, setDepartmentListLength]=useState();
+  const[professorListLength,setProfessorListLength]=useState();
  const typeOfUser=props.typeOfUser.type
   const getStudent = async () => {
     if(typeOfUser==="College"){
@@ -64,15 +66,39 @@ function Summary(props) {
       }
     }
 }
+const getProfessor = () => {
+  try {
+    if (typeOfUser.type === "College") {
+      const collegeId = typeOfUser.id;
+      axios
+        .post("http://localhost:8080/professor/fetchprofessors", {
+          collegeId,
+        })
+        .then((response) => {
+         setProfessorListLength(response.data.length);
+        });
+    } else {
+      axios
+        .get("http://localhost:8080/professor/fetchprofessors")
+        .then((response) => {
+          setProfessorListLength(response.data.length);
+        });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
   useEffect(() => {
     getStudent();
     getCollege();
-    getDepartment()
+    getDepartment();
+    getProfessor();
   }, []);
   return (
     <React.Fragment>
       <div className="d-flex flex-column justify-content-around align-items-center">
-        <h2>Summary</h2><br/><br/><br/>
+      <h2 className="mt-3">Welcome to {props.typeOfUser.type} Dashboard</h2>
+        <h2>{props.typeOfUser.type} : {props.typeOfUser.name}</h2><br/><br/>
         <div>
       <p className="fs-3 "> Number of Students in the Student List : {studentListLength} </p>
         </div>
@@ -82,7 +108,11 @@ function Summary(props) {
         <div>
         <p className="fs-3 ">   Number of Departments in the Department List : {departmentListLength}</p> 
         </div>
+        <div>
+        <p className="fs-3 ">   Number of Professors in the Professor List : {professorListLength}</p> 
+        </div>
       </div>
+      {/* <div className="h-25" style={{background:"blue"}}><Card/></div> */}
     </React.Fragment>
   );
 }

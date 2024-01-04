@@ -54,6 +54,9 @@ const handleUpdateCollege=(id)=>{
         setUpdate(true);
     })
 }
+const handleDetails=()=>{
+  console.log("Details")
+}
 useEffect(()=>{
  getCollege();
 },[])
@@ -73,6 +76,7 @@ useEffect(()=>{
           <th>Departments</th>
           <th>Ratings</th>
           <th>Update</th>
+          <th>Details</th>
           <th>Delete</th>
         </tr>
       </thead>
@@ -90,6 +94,7 @@ useEffect(()=>{
                 }))}</td>
                 <td>{college.Rating}</td>
                 <td> <Button type="submit" msg="Update" className="btn btn-primary"onClick={()=>handleUpdateCollege(college._id)}/></td>
+                <td><Button type="submit" msg="View" className="btn btn-info" onClick={()=>handleDetails(college)}/></td>
             <td><Button type="submit" msg="Delete" className="btn btn-danger" onClick={()=>handleDeleteCollege(college)}/></td>
 
             </tr>

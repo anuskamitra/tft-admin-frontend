@@ -6,7 +6,6 @@ import { useNavigate, Link } from "react-router-dom";
 import axios from "axios"
 function Login() {
   const navigate=useNavigate();
-
   useEffect(()=>{
     const user=JSON.parse(localStorage.getItem("userInfo"));
     if(user){
@@ -63,6 +62,28 @@ function Login() {
             console.log(err);
           }
         }
+        else if(userDetails.typeOfUser==="student"){
+          try{
+          axios.post("http://localhost:8080/api/login",userDetails)
+          .then(response=>{
+            console.log(response)
+            if(response.status===201){
+              localStorage.setItem("userInfo",JSON.stringify(response.data))
+              navigate("/students/PersonalDetails")
+            }
+            else{
+              if(response.data==="notFound"){
+                setUserNotFoundError("Student not Found!");
+              }
+              else{
+                setError((prev)=>({...prev,password:"Password do not match!"}));
+              }
+            }
+          })
+        }catch(err){
+          console.log(err);
+        }
+      }
         else{
           console.log("loggedin as college")
           try{
@@ -106,6 +127,7 @@ function Login() {
             </option>
             <option value="admin">Admin</option>
             <option value="college">College</option>
+            <option value="student">Student</option>
           </select>
           <p className='text-danger ms-1 mb-2'>{error.typeOfUser}</p>
 

@@ -26,3 +26,9 @@
 
 
 }
+.cart{
+    background-color: rgba(235, 232, 242, 0.1);
+    box-shadow: 2px 2px 2px 1px rgba(189,189,189,0.5);
+    padding: 5px;
+}
+

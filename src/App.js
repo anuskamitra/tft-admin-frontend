@@ -16,7 +16,7 @@ function App() {
       <Route path="/" exact element={<Signup/>}></Route>
       <Route path="/login"  element={<Login/>}></Route>
       <Route path="/home"  element={<Home/>}></Route>
-      <Route path="/input"  element={<InputController/>}></Route>
+      
      </Routes>
      </BrowserRouter>
     

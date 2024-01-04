@@ -68,8 +68,7 @@ const uploadPic=async()=>{
         ...props.studentDetails,
         photo:URL
       })
-      console.log(pic)   
-      console.log(props.studentDetails)
+     
      details={...props.studentDetails,photo:URL};
       })
     .catch(err=>{
@@ -79,22 +78,24 @@ const uploadPic=async()=>{
 }
   const handleSubmitStudentFrom = async(e) => {
     e.preventDefault();
-    console.log(props.studentDetails)
-    console.log(error)
+    
     setError({});
     let validationError=false;
     
 
     if (props.studentDetails.name === "") {
       setError((prev) => ({ ...prev, name: "Name is required!" }));
-      console.log("Invalid Name:", props.studentDetails.name);
       validationError=true;
     } 
     else if (!namePattern.test(props.studentDetails.name)) {
       setError((prev) => ({ ...prev, name: "Name is not valid!" }));
-      console.log("Invalid Name:"+ props.studentDetails.name);
+    
       validationError=true;
       
+    }
+    if(props.studentDetails.password===""){
+      setError((prev) => ({ ...prev, password: "Password is required!" }));
+      validationError=true;
     }
     if (props.studentDetails.college === "") {
       setError((prev) => ({ ...prev, college: "College is required!" }));
@@ -117,7 +118,7 @@ const uploadPic=async()=>{
       setError({});  
       try {
         await uploadPic();
-        console.log(details);
+       
         axios
           .post("http://localhost:8080/api/addnew", details)
           .then((response) => {
@@ -137,8 +138,8 @@ const uploadPic=async()=>{
   const handleUpdateStudentFrom = async(e) => {
     e.preventDefault();
     setError({});
-    console.log(props.studentDetails);
     let validationError=false;
+
     if (props.studentDetails.name === "") {
       setError((prev) => ({ ...prev, name: "Name is required!" }));
       validationError=true;
@@ -158,12 +159,19 @@ const uploadPic=async()=>{
       setError((prev) => ({ ...prev, email: "Email is not valid!" }));
       validationError=true
     } 
+    if(props.studentDetails.password===""){
+      setError((prev) => ({ ...prev, password: "Password is required!" }));
+      validationError=true;
+    }
     if(!validationError){
-      console.log(pic);
+    
       props.setShowStudentForm(false);
       props.setUpdateStudent(false);
+      
       try {
+
        await uploadPic().then(res=>{
+      console.log(details)
         axios
         .post("http://localhost:8080/api/update", details)
         .then((response) => {
@@ -172,6 +180,7 @@ const uploadPic=async()=>{
           props.setStudentDetails({
             id: "",
             name: "",
+            password:"",
             email: "",
             parent: "",
             college: "",
@@ -205,7 +214,7 @@ const uploadPic=async()=>{
   };
   
   useEffect(() => {
-    console.log(props.studentDetails)
+    
     getCollege();
 
   }, []);
@@ -265,6 +274,61 @@ const uploadPic=async()=>{
               })
             }
           />
+          <InputController 
+            label="Password"
+             type="password" 
+             req={true} 
+             error={error.password}
+            name="password"
+            placeholder="Password" 
+              value={props.studentDetails.password} 
+            onChange={(event)=>props.setStudentDetails({...props.studentDetails,password:event.target.value})}
+           />
+           <InputController
+            label="Father Name"
+            // error={error.name}
+            // req={true}
+            type="text"
+            placeholder="Enter Father name"
+            name="fatherName"
+            value={props.studentDetails.fatherName}
+            onChange={(event) =>
+              props.setStudentDetails({
+                ...props.studentDetails,
+                fatherName: event.target.value,
+              })
+            }
+          />
+          <InputController
+            label="Mother name of the Student"
+            // error={error.name}
+            // req={true}
+            type="text"
+            placeholder="Enter Mother name"
+            name="motherName"
+            value={props.studentDetails.motherName}
+            onChange={(event) =>
+              props.setStudentDetails({
+                ...props.studentDetails,
+                motherName: event.target.value,
+              })
+            }
+          />
+          <InputController
+            label="Mobile Number"
+            // error={error.name}
+            // req={true}
+            type="text"
+            placeholder="Enter mobile number"
+            name="name"
+            value={props.studentDetails.mobile}
+            onChange={(event) =>
+              props.setStudentDetails({
+                ...props.studentDetails,
+                mobile: event.target.value,
+              })
+            }
+          />
 
         {props.typeOfUser.type==="College"? 
         ""
@@ -284,17 +348,18 @@ const uploadPic=async()=>{
                })
              }
              }
+           
            >
              <option value={props.studentDetails.college}>
-               {props.studentDetails.collegeName}
+               {props.studentDetails.collegeName||"Select a College"}
              </option>
+           
              {collegeName.map((college) => {
                return <option value={college._id}>{college.Name}</option>;
              })}
            </select>
            <p className="text-danger">{error.college}</p> </div>}
       
-
           <InputController
             label="Date Of birth"
             type="date"
@@ -304,6 +369,21 @@ const uploadPic=async()=>{
               props.setStudentDetails({
                 ...props.studentDetails,
                 birthDay: event.target.value,
+              })
+            }
+          />
+           <InputController
+            label="Enter Semester in number(1-8)"
+            type="number"
+            name="sem"
+            min="1"
+             max="8"
+            placeholder="Sem in number"
+            value={props.studentDetails.sem}
+            onChange={(event) =>
+              props.setStudentDetails({
+                ...props.studentDetails,
+                sem: event.target.value,
               })
             }
           />
