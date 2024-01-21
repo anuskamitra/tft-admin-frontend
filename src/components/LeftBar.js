@@ -4,36 +4,55 @@ import 'bootstrap-icons/font/bootstrap-icons.css'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import {loggedInAsCollege} from "../store/slices/UserSlice"
+import { PiStudentFill } from "react-icons/pi";
+import { SlCalender } from "react-icons/sl";
+
 
 function LeftBar(props) {
+  const dispatch=useDispatch()
   const Navigate=useNavigate();
- const[studentDetails,setStudentDetails]=useState({});
+ const[showAlumniYear,setShowAlumniYear]=useState(false);
  
-const typeOfUser=useSelector((state)=>{
+ 
+const userState=useSelector((state)=>{
   return state.user
 })
 
-
+const typeOfUser=userState.type;
+const loggedIn=userState.loggedIn
+console.log(typeOfUser)
+console.log(loggedIn)
   const handleStudentShow=()=>{
        props.setShowCollegeList(false);
        props.setShowDepartmentList(false);
        props.setShowSummaryList(false);
        props.setShowProfessorList(false);
+       props.setShowAlumniList(false);
       props.setShowStudentList(!props.showStudentList);
+      setShowAlumniYear(false);
+      props.setChosenYear("");
   }
   const handleCollegeShow=()=>{
      props.setShowStudentList(false);
      props.setShowDepartmentList(false);
      props.setShowSummaryList(false);
      props.setShowProfessorList(false);
+     props.setShowAlumniList(false);
     props.setShowCollegeList(!props.showCollegeList);
+    setShowAlumniYear(false);
+    props.setChosenYear("");
   }
   const handleDepartmentShow=()=>{
      props.setShowStudentList(false);
      props.setShowProfessorList(false);
     props.setShowSummaryList(false);
     props.setShowCollegeList(false);
+    props.setShowAlumniList(false);
     props.setShowDepartmentList(!props.showDepartmentList);
+    setShowAlumniYear(false);
+    props.setChosenYear("");
 
   }
   const handleSummaryShow=()=>{
@@ -41,34 +60,41 @@ const typeOfUser=useSelector((state)=>{
     props.setShowCollegeList(false);
     props.setShowDepartmentList(false);
     props.setShowProfessorList(false);
+    props.setShowAlumniList(false);
     props.setShowSummaryList(!props.showSummaryList)
+    setShowAlumniYear(false);
+    props.setChosenYear("");
   }
   const handleTeacherShow=()=>{
     props.setShowStudentList(false);
     props.setShowCollegeList(false);
     props.setShowDepartmentList(false);
     props.setShowSummaryList(false);
+    props.setShowAlumniList(false);
     props.setShowProfessorList(!props.showProfessorList);
+    setShowAlumniYear(false);
+    props.setChosenYear("");
   }
   const handleProfileShow=()=>{
     props.setShowResult(false);
-   
     props.setShowProfile(!props.showProfile);
   }
   const handleResultShow=()=>{
     props.setShowProfile(false);
-   
     props.setShowResult(!props.showResult);
   }
- 
-  const getStudent=()=>{
-    const id=typeOfUser.id;
-    axios.post("http://localhost:8080/api/fetchOneStudent",{id})
-      .then(response=>{
-         console.log(response.data)
-        setStudentDetails(response.data);
-      });
+  const handleAlumniShow=()=>{
+    props.setShowStudentList(false);
+    props.setShowCollegeList(false);
+    props.setShowDepartmentList(false);
+    props.setShowSummaryList(false);
+    props.setShowProfessorList(false);
+  //  props.setShowAlumniList(!props.setAlumniList);
+    setShowAlumniYear(!showAlumniYear);
   }
+  
+ 
+  
   const handleLogout=()=>{
   const confirm=  window.confirm("Are you sure you want to logout")
   if(!confirm){
@@ -79,6 +105,26 @@ const typeOfUser=useSelector((state)=>{
     localStorage.removeItem('userInfo')
     Navigate("/")
   }
+  }
+  const handleBackToAdmin=()=>{
+    console.log("back")
+    const loggedInAs={
+      loggedInAsCollege:false,
+      collegeId:"",
+      collegeName:""
+    }
+    dispatch(loggedInAsCollege(loggedInAs))
+    props.setShowSummaryList(true);
+    props.setShowStudentList(false);
+    props.setShowCollegeList(false);
+    props.setShowDepartmentList(false);
+    props.setShowProfessorList(false);
+  }
+  const handleShowAlmuniYear=(year)=>{
+    console.log(year)
+    props.setShowAlumniList(true)
+    props.setChosenYear(year);
+
   }
   useEffect(()=>{
     // if(typeOfUser.type==="Student"){
@@ -91,14 +137,26 @@ const typeOfUser=useSelector((state)=>{
     <React.Fragment> 
       {typeOfUser.type==="College" || typeOfUser.type==="Admin" ?
     <div className={Styles.container}>
+
     <div className={Styles.heading}><i className="bi bi-speedometer2 ps-3"><span className={Styles.spanItem}>Dashboard</span></i></div>
     <hr/>
+
     <div  className={Styles.list}>
+      { loggedIn?.loggedInAsCollege && <div className="pb-3 ms-auto me-auto" ><button type="button" class="btn btn-light" onClick={handleBackToAdmin}>Admin</button></div>}
     <div className={`${Styles.listItem} ${props.showSummaryList && Styles.active}`}onClick={handleSummaryShow}><i className="bi bi-list-check ps-3"><span className={Styles.spanItem}>Summary</span></i></div>
-    <div className={`${Styles.listItem} ${props.showStudentList && Styles.active}`} onClick={handleStudentShow}><i className="bi bi-person ps-3"><span className={Styles.spanItem}>Students List</span></i></div>
-    {typeOfUser.type!="College" && <div className={`${Styles.listItem} ${props.showCollegeList && Styles.active}`} onClick={handleCollegeShow}><i className="bi bi-building ps-3"><span className={Styles.spanItem}>College List</span></i></div>}
+    <div className={`${Styles.listItem} ${props.showStudentList && Styles.active}`}onClick={handleStudentShow}><i className="bi bi-person ps-3"><span className={Styles.spanItem}>Students List</span></i></div>
+    {(typeOfUser.type!="College"&& !loggedIn?.loggedInAsCollege) && <div className={`${Styles.listItem} ${props.showCollegeList && Styles.active}`} onClick={handleCollegeShow}><i className="bi bi-building ps-3"><span className={Styles.spanItem}>College List</span></i></div>}
     <div className={`${Styles.listItem} ${props.showDepartmentList && Styles.active}`} onClick={handleDepartmentShow}><i className="bi bi-briefcase ps-3"><span className={Styles.spanItem}>Department List</span></i></div>
     <div className={`${Styles.listItem} ${props.showProfessorList && Styles.active}`} onClick={handleTeacherShow}><i className="bi bi-person-square ps-3"><span className={Styles.spanItem}>Professors List</span></i></div>
+    <div className={`${Styles.listItem} ${props.showCalander && Styles.active}`} onClick={()=>props.setShowCalander(true)}><i className="bi bi-person-square ps-3"><span className={Styles.spanItem}>holiday List</span></i></div>
+    <div className={`${Styles.listItem} ${props.showAlumniList && Styles.active}`} onClick={handleAlumniShow}><i className="ps-3 "> <PiStudentFill size={"26px"} /><span className={Styles.spanItem}>Alumni List</span></i></div>
+    {showAlumniYear &&
+     <nav className={`${Styles.yearList} your-div pt-2 `} style={{ overflowY: 'auto', maxHeight: '140px' }}>
+      <ul className={`${Styles.yearListItem} ${props.chosenYear==2020 && Styles.yearActive}`} onClick={()=>handleShowAlmuniYear(2020)}><SlCalender /><span className={`${Styles.spanItem}`}>2020</span></ul>
+      <ul className={`${Styles.yearListItem} ${props.chosenYear==2021 && Styles.yearActive}` } onClick={()=>handleShowAlmuniYear(2021)}><SlCalender /><span className={Styles.spanItem}>2021</span></ul>
+      <ul className={`${Styles.yearListItem} ${props.chosenYear==2022 && Styles.yearActive}`} onClick={()=>handleShowAlmuniYear(2022)}><SlCalender /><span className={Styles.spanItem}>2022 </span></ul>
+      <ul className={`${Styles.yearListItem} ${props.chosenYear==2023 && Styles.yearActive}`} onClick={()=>handleShowAlmuniYear(2023)}><SlCalender /><span className={Styles.spanItem}>2023</span></ul>
+      </nav>}
    <div className={Styles.navButton} onClick={handleLogout}><i className="bi bi-box-arrow-left ps-3 "><span className={`${Styles.spanItem}`}>Logout</span></i></div>
     </div>
     </div>
@@ -110,6 +168,7 @@ const typeOfUser=useSelector((state)=>{
          <div  className={`${Styles.list} `}>
          <div className={`${Styles.listItem} ps-3 ${props.showProfile && Styles.active}`} onClick={handleProfileShow}><i className="bi bi-person-circle ps-3"><span className={Styles.spanItem}>Profile</span></i></div>
          <div className={`${Styles.listItem} ps-3 ${props.showResult && Styles.active}`} onClick={handleResultShow}><i className="bi bi-file-earmark-text ps-3"><span className={Styles.spanItem}>Result</span></i></div>
+         <div className={`${Styles.listItem} ${props.showCalander && Styles.active}`} onClick={()=>props.setShowCalander(true)}><i className="bi bi-person-square ps-3"><span className={Styles.spanItem}>holiday List</span></i></div>
          <div className={`${Styles.navButton} ps-3`} onClick={handleLogout}><i className="bi bi-box-arrow-left ps-3 "><span className={`${Styles.spanItem}`}>Logout</span></i></div>
         </div>
       </div>

@@ -1,19 +1,38 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Card from "./Card"
+import { useSelector } from "react-redux";
+
 
 function Summary(props) {
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  
+  const typeOfUser=userState.type;
+  const loggedIn=userState.loggedIn
   const [studentListLength, setStudentListLength] = useState();
   const [collegeListLength, setCollegeListLength] = useState();
   const [ departmentListLength, setDepartmentListLength]=useState();
   const[professorListLength,setProfessorListLength]=useState();
- const typeOfUser=props.typeOfUser.type
+
   const getStudent = async () => {
-    if(typeOfUser==="College"){
-      const collegeId=props.typeOfUser.id;
+    console.log("getStudents")
+    if(typeOfUser.type==="College"|| loggedIn.loggedInAsCollege){ 
+   
+      let collegeId="";
+      if(typeOfUser.type === "College"){
+       
+
+        collegeId = typeOfUser.id
+       
+     }
+     else{
+       collegeId=loggedIn.collegeId
+     }
       try{
+        console.log(collegeId)
         axios.post("http://localhost:8080/api/countStudents",{collegeId}).then(response=>{
-          const data=response.data.count;
+          const data=response.data.length;
           setStudentListLength(data);
         })
       }catch(err){
@@ -43,33 +62,41 @@ function Summary(props) {
     }
   };
   const getDepartment=()=>{
-    if(typeOfUser==="College"){
-      const collegeId=props.typeOfUser.id;
-      try{
+    try{
+    if(typeOfUser.type==="College"||loggedIn.loggedInAsCollege){
+        let collegeId="";
+        if(typeOfUser.type === "College"){
+          collegeId = typeOfUser.id
+       }
+       else{
+         collegeId=loggedIn.collegeId
+       }
+   
         axios.post("http://localhost:8080/college/fetchdepartments",{collegeId})
         .then(response=>{
           setDepartmentListLength(response.data.length);
         })
-      }catch(err){
-        console.log(err)
-      }
     }
     else{
-
-    try{
         axios.get("http://localhost:8080/department/fetchdepartments")
         .then(response=>{
             setDepartmentListLength(response.data.length);
         })
-      }catch(err){
-        console.log(err)
       }
+    }catch(err){
+      console.log(err)
     }
-}
+  }
 const getProfessor = () => {
   try {
-    if (typeOfUser.type === "College") {
-      const collegeId = typeOfUser.id;
+    if (typeOfUser.type === "College" ||loggedIn.loggedInAsCollege) {
+       let collegeId="";
+        if(typeOfUser.type === "College"){
+          collegeId = typeOfUser.id
+       }
+       else{
+         collegeId=loggedIn.collegeId
+       }
       axios
         .post("http://localhost:8080/professor/fetchprofessors", {
           collegeId,
@@ -97,12 +124,12 @@ const getProfessor = () => {
   return (
     <React.Fragment>
       <div className="d-flex flex-column justify-content-around align-items-center">
-      <h2 className="mt-3">Welcome to {props.typeOfUser.type} Dashboard</h2>
-        <h2>{props.typeOfUser.type} : {props.typeOfUser.name}</h2><br/><br/>
+      <h2 className="mt-3">Welcome to {loggedIn?.loggedInAsCollege?"College":typeOfUser.type} Dashboard</h2>
+        <h2>{loggedIn?.loggedInAsCollege?"College":typeOfUser.type} : {loggedIn?.loggedInAsCollege?loggedIn.collegeName:typeOfUser.name}</h2><br/><br/>
         <div>
       <p className="fs-3 "> Number of Students in the Student List : {studentListLength} </p>
         </div>
-      {props.typeOfUser.type!=="College" &&  <div>
+      {(typeOfUser.type!=="College" && !loggedIn?.loggedInAsCollege)&&  <div>
        <p className="fs-3 ">Number of Colleges in the Colleg List : {collegeListLength}</p> 
         </div>}
         <div>

@@ -11,7 +11,7 @@ function Cards(props) {
   const [showSubmitButton, setShowSubmitButton] = useState(true);
   const [result, setResult] = useState("");
   const [title, setTitle] = useState("");
-  const [disabled, setDisabled] = useState(true);
+  const[status,setStatus]=useState("");
   const [showInputField, setShowInputField] = useState(false);
   const[showView,setShowView]=useState(true);
   const semOfStudent = props.semester;
@@ -22,9 +22,8 @@ function Cards(props) {
     formData.append("id", props.id);
     formData.append("title", title);
     formData.append("result", result);
-    console.log(title);
-    console.log(result);
-    console.log(formData);
+    formData.append("status",status)
+
 
     const response = await axios.post(
       "http://localhost:8080/api/uploadResult",
@@ -33,7 +32,6 @@ function Cards(props) {
         headers: { "Content-Type": "multipart/form-data" },
       }
     );
-    console.log(formData);
     console.log(response);
     if (response) {
       setShowSubmitButton(false);
@@ -45,7 +43,9 @@ function Cards(props) {
   };
 
   const viewResult = async () => {
+    
     const pdfURL = props.resultList.find((obj) => obj.Title === semOfStudent);
+    console.log(pdfURL);
     console.log(pdfURL.Result);
     window.open(
       "http://localhost:8080/files/" + pdfURL.Result,
@@ -70,7 +70,6 @@ function Cards(props) {
   useEffect(() => {
     setTitle(props.semester);
   }, [result]);
- 
   return (
     <React.Fragment>
       <div
@@ -134,10 +133,20 @@ function Cards(props) {
             //   style={{ display: "none" }}
             onChange={(e) => {
               setResult(e.target.files[0]);
-              setDisabled(false);
+            
             }}
             name={result}
           />
+          <div className="form-check">
+          <label className="form-check-label" >
+          <input className="form-check-input" type="radio" value="true"name="status" onChange={(event=>setStatus(event.target.value))}/>
+          <h6>Pass</h6>
+          </label><br/>
+          <label className="form-check-label">
+          <input className="form-check-input" type="radio" value="false" name="status" onChange={(event=>setStatus(event.target.value))}/>
+          <h6>Fail</h6>
+          </label>
+          </div>
 
           <div className="text-center ">
             <Button
@@ -145,7 +154,7 @@ function Cards(props) {
               msg="submit"
               onClick={submitResult}
               type="submit"
-              disabled={disabled}
+             disabled={!result || !status}
             />
             <Button
               className="bg-dark ms-3"

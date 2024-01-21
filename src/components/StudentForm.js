@@ -3,12 +3,22 @@ import InputController from "./InputController";
 import axios from "axios";
 import Button from "./Button";
 import Styles from "./StudentForm.module.css";
+import { useSelector } from "react-redux";
+// import DatePicker from 'react-datepicker';
+// import DatePicker from "react-datepicker";
+// import "react-datepicker/dist/react-datepicker.css";
 
 function StudentForm(props) {
- 
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  const typeOfUser=userState.type;
+  const loggedIn=userState.loggedIn;
   const [error, setError] = useState({});
   const[studentExistsError,setStudentExistsError]=useState("");
   const [pic,setPic]=useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [selectedYear, setSelectedYear] = useState(null);
   const [collegeName, setCollegeName] = useState([]);
   const[departmentList,setDepartmentList]=useState([])
   let selectedCollegeName="";
@@ -18,8 +28,8 @@ function StudentForm(props) {
  let details={};
   const getCollege = () => {
     try {
-      if(props.typeOfUser.type==="College"){
-        const collegeId=props.typeOfUser.id
+      if(typeOfUser.type==="College"){
+        const collegeId=typeOfUser.id
         axios.post("http://localhost:8080/college/fetchonecollege",{collegeId})
         .then(response=>{
           let data=response.data;
@@ -118,7 +128,7 @@ const uploadPic=async()=>{
       setError({});  
       try {
         await uploadPic();
-       
+       console.log(details)
         axios
           .post("http://localhost:8080/api/addnew", details)
           .then((response) => {
@@ -212,7 +222,6 @@ const uploadPic=async()=>{
     });
     props.setUpdateStudent(false);
   };
-  
   useEffect(() => {
     
     getCollege();
@@ -235,13 +244,10 @@ const uploadPic=async()=>{
            onChange={(event) =>
             setPic(event.target.files[0])
           }
-          
           />
-          {/* <div>
-      <label>Previous Photo:</label>
-      <input type="text" readOnly value={props.studentDetails.photo} /> */}
-    {/* </div> */}
-
+          
+   
+   
           <InputController
             label="Name of the Student"
             error={error.name}
@@ -257,7 +263,6 @@ const uploadPic=async()=>{
               })
             }
           />
-
           <InputController
             label="Email"
             type="email"
@@ -314,6 +319,19 @@ const uploadPic=async()=>{
               })
             }
           />
+             <InputController
+            label="Passing date"
+            type="date"
+            name="passingDate"
+            value={props.studentDetails.passingDate}
+            onChange={(event) =>
+              props.setStudentDetails({
+                ...props.studentDetails,
+                passingDate: event.target.value,
+              })
+            }
+          />
+
           <InputController
             label="Mobile Number"
             // error={error.name}
@@ -330,7 +348,7 @@ const uploadPic=async()=>{
             }
           />
 
-        {props.typeOfUser.type==="College"? 
+        {typeOfUser.type==="College"? 
         ""
             :<div><label className="fw-2">
              College/University name<span style={{ color: "red" }}>*</span>
@@ -344,18 +362,16 @@ const uploadPic=async()=>{
                  ...props.studentDetails,
                  college: event.target.value,
                  selectedColl:selectedCollege
-
                })
-             }
-             }
-           
-           >
-             <option value={props.studentDetails.college}>
-               {props.studentDetails.collegeName||"Select a College"}
-             </option>
-           
+             }}
+            >
+            <option value={props.studentDetails.college}>
+              {props.studentDetails.collegeName||"Select a College"}
+            </option>
              {collegeName.map((college) => {
-               return <option value={college._id}>{college.Name}</option>;
+              if((props.studentDetails.collegeName!=college.Name) && !college.BlackListed)
+               return <option value={college._id}>{college.Name}
+               </option>
              })}
            </select>
            <p className="text-danger">{error.college}</p> </div>}
@@ -389,7 +405,7 @@ const uploadPic=async()=>{
           />
          
             <label className="fw-2">
-            Department name<span style={{ color: "red" }}>*</span>{ props.typeOfUser.type!=="College"  && <span  style={{fontSize:"12px", color:"red"}}> (Please first select college to see the available departments)</span>}
+            Department name<span style={{ color: "red" }}>*</span>{ typeOfUser.type!=="College"  && <span  style={{fontSize:"12px", color:"red"}}> (Please first select college to see the available departments)</span>}
           </label>
           <select
             className={`form-select ${error.department && "border border-danger"}`}
@@ -404,6 +420,7 @@ const uploadPic=async()=>{
               {props.studentDetails?.departmentName||"Choose a value"}
             </option>
           {props.studentDetails.selectedColl?.Departments?.map((department) => {
+             if(props.studentDetails.departmentName!=department.Name)
                return <option value={department._id}>{department.Name}</option>;
             })}
             

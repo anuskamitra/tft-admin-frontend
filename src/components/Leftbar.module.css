@@ -31,23 +31,47 @@
 }
 .listItem:hover{
     background-color:rgb(255, 251, 251);
-    width:100%;
-    height:45px;
+    /* width:100%;
+    height:45px; */
     padding-bottom: 2px;
     padding-top: 4px;
-    /* box-shadow: 0 5px 10px rgba(255,255,255,0.4); */
+    box-shadow: 0 5px 10px rgba(255,255,255,0.4);
+    color: #6593f7;   
+} 
+.yearList{
+    height:150px;
+    width: 100%;
+    background-color:rgba(245, 238, 238, 0.4);
+    box-shadow: 5px 5px 5px rgba(255,255,255,0.4);
+
+}
+.yearListItem{
+    height: 45px;
+   
+    color: black;
+    margin: 0px 0;
+}
+.yearListItem:hover{
+    background-color:rgb(255, 251, 251);
     color: #6593f7;   
 }
 .active{
     background-color:rgb(255, 251, 251);
     width:100%;
     height:45px;
-    border-radius: 6px;
     padding-bottom: 2px;
     padding-top: 4px;
-    box-shadow: 0 5px 10px rgba(255,255,255,0.4);
     color: #6593f7;
-   
+     border: 2px solid rgb(215, 204, 206);
+}
+.yearActive{
+    background-color:rgba(255, 255, 255, 0.3);
+    width:100%;
+    height:45px;
+    padding-bottom: 2px;
+    padding-top: 4px;
+    color: #6c4646;
+    
 }
 .spanItem{
     padding-left: 6%;

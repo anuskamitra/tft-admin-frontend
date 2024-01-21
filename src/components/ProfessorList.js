@@ -1,19 +1,25 @@
 import React, { useEffect, useState } from "react";
 import Styles from "./Students.module.css";
 import Button from "./Button";
+import { useSelector } from "react-redux";
 
 import axios from "axios";
 import Table from "react-bootstrap/Table";
 import ProfessorForm from "./ProfessorForm";
 
 function TeacherList(props) {
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  
+  const typeOfUser=userState.type;
+  const loggedIn=userState.loggedIn
+  console.log(typeOfUser)
   const [showProfessorForm, setShowProfessorForm] = useState(false);
   const [professorList, setProfessorList] = useState([]);
   const [professorDetails,setProfessorDetails]=useState({Name:"",Email:"",College:"",Department:"",Photo:""})
   const [updateProfessor,setUpdateProfessor]=useState(false)
   const [collegeList,setCollegeList]=useState([])
-  const typeOfUser = props.typeOfUser;
-
 
   const getCollege = () => {
     try {  
@@ -29,9 +35,15 @@ function TeacherList(props) {
     }
   };
   const getProfessor = () => {
+    let collegeId
     try {
-      if (typeOfUser.type === "College") {
-        const collegeId = typeOfUser.id;
+      if (typeOfUser.type === "College" || loggedIn.loggedInAsCollege) {
+        if(typeOfUser.type === "College"){
+          collegeId = typeOfUser.id
+       }
+       else{
+         collegeId=loggedIn.collegeId
+       }  
         axios
           .post("http://localhost:8080/professor/fetchprofessors", {
             collegeId,
@@ -103,7 +115,7 @@ function TeacherList(props) {
           />
         </p>
       </div>
-      {showProfessorForm && <ProfessorForm typeOfUser={typeOfUser} setShowProfessorForm={setShowProfessorForm} setProfessorList={setProfessorList} getProfessor={getProfessor} professorDetails={professorDetails} setProfessorDetails={setProfessorDetails} updateProfessor={updateProfessor} setUpdateProfessor={setUpdateProfessor}/>}
+      {showProfessorForm && <ProfessorForm  setShowProfessorForm={setShowProfessorForm} setProfessorList={setProfessorList} getProfessor={getProfessor} professorDetails={professorDetails} setProfessorDetails={setProfessorDetails} updateProfessor={updateProfessor} setUpdateProfessor={setUpdateProfessor}/>}
       <div className={Styles.tableContainer}>
         <Table striped bordered size="lg">
           <thead>
@@ -111,7 +123,7 @@ function TeacherList(props) {
               <th>Image</th>
               <th>Name</th>
               <th>Email</th>
-              {typeOfUser.type !== "College" && <th>College</th>}
+              {(typeOfUser.type!=="College" && !loggedIn.loggedInAsCollege) &&<th>College</th>}
               <th>Department</th>
               <th>Update</th>
               <th>Delete</th>
@@ -129,7 +141,7 @@ function TeacherList(props) {
                   </td>
                   <td>{professor.Name} </td>
                   <td>{professor.Email} </td>
-                  {typeOfUser.type !== "College" && (
+                  {(typeOfUser.type!=="College" && !loggedIn.loggedInAsCollege)  && (
                     <td>{professor.College?.Name} </td>
                   )}
                   <td>{professor.Department?.Name}</td>

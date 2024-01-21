@@ -3,14 +3,22 @@ import Table from "react-bootstrap/Table";
 import Styles from "../Students.module.css";
 import { LuView } from "react-icons/lu";
 import { LuDownload } from "react-icons/lu";
+import { GrView } from "react-icons/gr";
+import { useSelector } from "react-redux";
 import axios from "axios";
 
 function StudentResult(props) {
+  const userState=useSelector((state)=>{
+    return state.user
+  }) 
+  const typeOfUser=userState.type;
+  console.log(typeOfUser)
+  
   const [resultList, setResultList] = useState([]);
-  const results = [];
-  const [arr, setArr] = useState([]);
-  const id = props.typeOfUser.id;
-  const sem = props.typeOfUser.sem;
+
+  const id = typeOfUser.id;
+  const sem = typeOfUser.sem;
+  const Name=typeOfUser.name
   const backendURL = "http://localhost:8080";
   const getResults = () => {
     axios.post(backendURL + "/api/fetchOneStudent", { id }).then((response) => {
@@ -32,7 +40,6 @@ function StudentResult(props) {
         aTag.setAttribute("download", fileName);
         document.body.appendChild(aTag);
         aTag.click();
-        //  aTag.remove();
         document.body.removeChild(aTag);
       })
       .catch((error) => {
@@ -49,7 +56,7 @@ function StudentResult(props) {
     );
   };
   let semestersToShow = Array.from(
-    { length: sem - 1 },
+    { length: sem},
     (_, index) => index + 1
   );
   useEffect(() => {
@@ -58,7 +65,7 @@ function StudentResult(props) {
   return (
     <div className="">
       <h3 className=" text-muted text-center pb-3">
-        Results of All the Semesters
+        All Semesters Results of {Name}
       </h3>
       <div className={Styles.resultContainer}>
         <Table striped bordered size="lg">
@@ -75,16 +82,16 @@ function StudentResult(props) {
                        <td>
                         <h5 className="text-muted">
                           <button
-                            className="fw-bold  pb-1"
+                            className="fw-bold w-25 pb-1"
                             style={{
-                              background: "#6593f7",
+                              background: "rgb(101,147,247)",
                               border: "none",
                               color: "white",
                             }}
                             type="submit"
                             onClick={() => handleShowResult(index + 1)}
                           >
-                            {<LuView />}
+                            {<GrView />}
                           </button>
                         </h5>
                         </td>
@@ -92,7 +99,7 @@ function StudentResult(props) {
                     <h5>
                       <button  className="fw-bold pb-1"
                           style={{
-                            background:"black",
+                            background:"#6aa84f",
                             border: "none",
                             color: "white",
                           }}
@@ -109,12 +116,12 @@ function StudentResult(props) {
                          
                           className="fw-bold w-25 pb-1"
                           style={{
-                            background: "#c5c6d0",
+                            background: "rgba(101,147,247,0.2)",
                             border: "none",
                             color: "white",
                           }}
                         >
-                          {<LuView />}
+                          {<GrView />}
                         </button>
                       </h5>
                       </td>
@@ -123,7 +130,7 @@ function StudentResult(props) {
                       <button  className="fw-bold pb-1"
                        disabled="true"
                           style={{
-                            background:"#c5c6d0",
+                            background:"rgba(182,215,168,0.5)",
                             border: "none",
                             color: "white",
                           }}

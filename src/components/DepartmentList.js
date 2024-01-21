@@ -4,8 +4,16 @@ import Button from "./Button";
 import Styles from "./Students.module.css";
 import DepartmentForm from "./DepartmentForm";
 import axios from "axios";
+import {useSelector} from "react-redux"
 
 function DepartmentList(props) {
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  
+  const typeOfUser=userState.type;
+  const loggedIn=userState.loggedIn
+
   const [departmentList, setDepartmentList] = useState([]);
   const [showDepartmentForm, setShowDepartmentForm] = useState(false);
   const [departmentDetails, setDepartmentDetails] = useState({
@@ -14,7 +22,6 @@ function DepartmentList(props) {
   });
   const [update, setUpdate] = useState(false);
   const backendURL = "http://localhost:8080";
-  const typeOfUser = props.typeOfUser.type;
   const handleDeleteDepartment = async (departmentDetails) => {
     const shouldDelete = window.confirm(
       "Are you sure you want to delete The Department?"
@@ -22,8 +29,8 @@ function DepartmentList(props) {
     if (!shouldDelete) {
       return;
     } else {
-      if (typeOfUser === "College") {
-        const collegeId = props.typeOfUser.id;
+      if (typeOfUser.type === "College") {
+        const collegeId = typeOfUser.id;
         const details={...departmentDetails,collegeId}
         console.log(details);
         await axios.post(backendURL + "/college/department/delete",details)
@@ -57,11 +64,17 @@ function DepartmentList(props) {
       });
   };
   const getDepartment = () => {
-    if (typeOfUser === "College") {
-      const collegeId = props.typeOfUser.id;
+    let collegeId="";
+    if (typeOfUser.type === "College"||loggedIn.loggedInAsCollege) {
+      if(typeOfUser.type === "College"){
+         collegeId = typeOfUser.id
+      }
+      else{
+        collegeId=loggedIn.collegeId
+      }
+
       console.log(collegeId);
-      try {
-        
+      try { 
         axios
           .post("http://localhost:8080/college/fetchdepartments", { collegeId })
           .then((response) => {
@@ -106,7 +119,7 @@ function DepartmentList(props) {
           getDepartment={getDepartment}
           departmentList={departmentList}
           update={update}
-          typeOfUser={props.typeOfUser}
+          typeOfUser={typeOfUser}
           setUpdate={setUpdate}
         />
       )}
@@ -115,7 +128,7 @@ function DepartmentList(props) {
           <thead>
             <tr>
               <th>Department name</th>
-             {props.typeOfUser.type!=="College" && <th>Update</th>}
+             {(typeOfUser.type!=="College" && !loggedIn.loggedInAsCollege) && <th>Update</th>}
               <th>Delete</th>
             </tr>
           </thead>
@@ -124,7 +137,7 @@ function DepartmentList(props) {
               return (
                 <tr key={department._id}>
                   <td>{department.Name}</td>
-                 {props.typeOfUser.type!=="College" && <td>
+                 {(typeOfUser.type!=="College" && !loggedIn.loggedInAsCollege) && <td>
                     {" "}
                     <Button
                       type="submit"

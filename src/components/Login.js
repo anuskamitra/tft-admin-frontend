@@ -14,6 +14,7 @@ function Login() {
  },[])
     const [userDetails,setUserDetails]=useState({email:"", password:"",typeOfUser:""})
     const [userNotFoundError,setUserNotFoundError]=useState("");
+    const[blackListed,setBlackListed]=useState("");
     const [error,setError]=useState({});
     const rgExp=/^[a-z0-9._]+@[a-z]+\.[a-z]{2,6}$/;
      const handleLogin=async(e)=>{
@@ -21,6 +22,7 @@ function Login() {
       let validationError=false;
       setError({})
       setUserNotFoundError("");
+      setBlackListed("")
       console.log(userDetails)
       if (userDetails.email === "") {
         setError((prev)=>({...prev,email:"Email is required!"}))
@@ -69,11 +71,14 @@ function Login() {
             console.log(response)
             if(response.status===201){
               localStorage.setItem("userInfo",JSON.stringify(response.data))
-              navigate("/students/PersonalDetails")
+              navigate("/home")
             }
             else{
               if(response.data==="notFound"){
                 setUserNotFoundError("Student not Found!");
+              }
+              else if(response.data==="BlackListed"){
+                setBlackListed("You can't access you profile");
               }
               else{
                 setError((prev)=>({...prev,password:"Password do not match!"}));
@@ -93,9 +98,13 @@ function Login() {
                 localStorage.setItem("userInfo",JSON.stringify(response.data))
                 navigate("/home")
               }
-              else{
-                if(response.data==="notFound"){
+
+              else{  
+                 if(response.data==="notFound"){
                   setUserNotFoundError("College not Found!");
+                }
+               else if(response.data==="BlackListed"){
+                  setBlackListed("Admin BlackListed this College!");
                 }
                 else{
                   setError((prev)=>({...prev,password:"Password do not match!"}));
@@ -134,6 +143,7 @@ function Login() {
           <InputController req={true} label="Enter your Email" error={error.email} placeholder="example@gmail.com"  type="email" required name="email" value={userDetails.email} onChange={(event)=>setUserDetails((prev)=>({...prev,email:event.target.value}))}/>
           <InputController req={true} label="Enter Password" error={error.password} type="password"  placeholder="Enter password" required name="password" value={userDetails.password }onChange={(event)=>setUserDetails((prev)=>({...prev,password:event.target.value}))}/>
           {userNotFoundError && <p className="fs-5 fw-bold text-center text-danger m-0">{userNotFoundError}</p>}
+          {blackListed && <p className="fs-5 fw-bold text-center text-danger m-0">{blackListed}</p> }
 
          <div className='d-grid'>
           <Button type="submit" msg="Login" onClick={handleLogin}/>

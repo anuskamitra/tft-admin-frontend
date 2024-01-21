@@ -2,15 +2,22 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Table from "react-bootstrap/esm/Table";
 import UpdateForm from "./UpdateForm";
+import { useSelector } from "react-redux";
 
 function PersonalDetails(props) {
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  const typeOfUser=userState.type
+  console.log(typeOfUser)
+  
   const [studentDetails, setStudentDetails] = useState({});
   const [updateForm, setUpdateForm] = useState(false);
   const [mobileNoUpdate, setMobileNoUpdate] = useState(false);
   const [emailUpdate, setEmailUpdate] = useState(false);
   const getStudent = () => {
-    console.log(props.typeOfUser);
-    const id = props.typeOfUser.id;
+    console.log(typeOfUser);
+    const id = typeOfUser.id;
     axios
       .post("http://localhost:8080/api/fetchOneStudent", { id })
       .then((response) => {
@@ -24,17 +31,17 @@ function PersonalDetails(props) {
 
   return (
     <React.Fragment>
-      <h4 className="text-center text-muted">Student's Basic Details</h4>
+      <h4 className="text-center text-muted">Basic Details</h4>
       <div className="d-flex w-75 flex-row m-auto align-center justify-content-between mt-5">
         {updateForm && (
           <UpdateForm
+          studentDetails={studentDetails}
             setUpdateForm={setUpdateForm}
             updateForm={updateForm}
             setMobileNoUpdate={setMobileNoUpdate}
             mobileNoUpdate={mobileNoUpdate}
             emailUpdate={emailUpdate}
             setEmailUpdate={setEmailUpdate}
-            typeOfUser={props.typeOfUser}
             getStudent={ getStudent}
           />
         )}
@@ -147,7 +154,7 @@ function PersonalDetails(props) {
         </Table>
         <div className="d-flex  align-items-center ms-3">
           {" "}
-          {/* <img
+          <img
             src={studentDetails.Photo}
             style={{
               width: "200px",
@@ -155,7 +162,7 @@ function PersonalDetails(props) {
               borderRadius: "0%",
               border: "5px solid #e5e7e9",
             }}
-          ></img> */}
+          ></img>
         </div>
         {/* </div> */}
       </div>

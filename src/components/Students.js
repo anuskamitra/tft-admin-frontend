@@ -11,6 +11,7 @@ import ResultForm from './ResultForm';
 
 
 function Students(props) {
+const[nameOfStudent,setNameOfStudent]=useState("");
 const[idToUpdate,setIdToUpdate]=useState("")
 const[showStudentFrom,setShowStudentForm]=useState(false);
 const[studentList,setStudentList]=useState([]);
@@ -20,9 +21,14 @@ const[showResultForm,setShowResultForm]=useState(false);
 const[resultList,setResultList]=useState([])
 const[sem,setSem]=useState(0)
 
-const typeOfUser=useSelector((state)=>{
+const userState=useSelector((state)=>{
   return state.user
 })
+const typeOfUser=userState.type;
+const loggedIn=userState.loggedIn;
+
+
+
 const[studentDetails,setStudentDetails]=useState({
   id:"",
   name:"",
@@ -45,14 +51,21 @@ const[studentDetails,setStudentDetails]=useState({
 const backendURL="http://localhost:8080";
 
 const getStudent=async()=>{
-  if(typeOfUser.type==="College"){
+  console.log("hello");
+  if(typeOfUser.type==="College"|| loggedIn.loggedInAsCollege){
+    console.log("in if")
+    let collegeId="";
+    if(typeOfUser.type === "College"){
+      collegeId = typeOfUser.id
+   }
+   else{
+     collegeId=loggedIn.collegeId
+   }
     try{
-      const collegeId=typeOfUser.id;
-      
       axios.post("http://localhost:8080/api/fetchStudents",{collegeId})
       .then(response=>{
           const data=response.data;
-        
+        console.log(data)
           setStudentList(data);       
       })
   }
@@ -61,6 +74,7 @@ const getStudent=async()=>{
   }
   }
   else{
+    console.log("in else")
     try{
       axios.get("http://localhost:8080/api/fetchStudents")
       .then(response=>{
@@ -108,8 +122,7 @@ const handleUpdateStudent=async(id)=>{
             if(response.status===200){
                 const studentInfo=response.data;
                 console.log(studentInfo.College._id)
-                let selectedCollege=collegeList.find(ob=>ob._id===studentInfo.College._id)
-                
+                let selectedCollege=collegeList.find(ob=>ob._id===studentInfo.College._id)  
                 setUpdateStudent(true);
                 setShowStudentForm(true);
                  setStudentDetails({
@@ -140,11 +153,13 @@ const handleAddResult=async(id)=>{
   
   axios.post(backendURL+"/api/fetchOneStudent",{id})
   .then(response=>{
+
     setSem(response.data.Sem)
     console.log(response.data)
     console.log(response.data.Results)
     setResultList(response.data?.Results);
     setIdToUpdate(id);
+    setNameOfStudent(response.data.Name)
     setShowResultForm(true);
   }) 
 }
@@ -161,11 +176,11 @@ const handleAddResult=async(id)=>{
   return (
     <div className={Styles.container}> 
     <h2 className='text-center'> Students List</h2>
-   {typeOfUser.type!=="College" &&  <div>
+   {(typeOfUser.type!=="College"  && !loggedIn.loggedInAsCollege) && <div>
      <p className="mt-2 text-center text-success">To add a new Student  <Button className="btn btn-success" msg="Add" type="submit" onClick={()=>setShowStudentForm(true)}/></p>
      </div>}
-     {showStudentFrom && <StudentForm typeOfUser={typeOfUser} setShowStudentForm={setShowStudentForm} setStudentList={setStudentList} getStudent={getStudent} studentDetails={studentDetails} setStudentDetails={setStudentDetails} updateStudent={updateStudent} setUpdateStudent={setUpdateStudent} />}
-     {showResultForm && <ResultForm showResultForm={showResultForm }setShowResultForm={setShowResultForm} sem={sem} idToUpdate={idToUpdate} resultList={resultList}/>}
+     {showStudentFrom && <StudentForm setShowResultForm={setShowResultForm} typeOfUser={typeOfUser} setShowStudentForm={setShowStudentForm} setStudentList={setStudentList} getStudent={getStudent} studentDetails={studentDetails} setStudentDetails={setStudentDetails} updateStudent={updateStudent} setUpdateStudent={setUpdateStudent} />}
+     {showResultForm && <ResultForm showResultForm={showResultForm }setShowResultForm={setShowResultForm} sem={sem} nameOfStudent={nameOfStudent} idToUpdate={idToUpdate} resultList={resultList}/>}
      <div className={Styles.tableContainer}>
 
      <Table striped bordered size="lg">
@@ -174,33 +189,33 @@ const handleAddResult=async(id)=>{
            <th>Image</th>
           <th>Name</th>
           <th>Email</th>
-         {typeOfUser.type!=="College" &&<th>College</th>}
+         {(typeOfUser.type!=="College"  && !loggedIn.loggedInAsCollege) && <th>College</th>}
           <th>Department</th>
           <th>Semester</th>
           <th>Birthday</th>
-          {typeOfUser.type!=="College" && <th>Update</th>}
-          {typeOfUser.type!=="College" &&<th>Delete</th>}
-          {typeOfUser.type==="College" &&<th>Upload Result</th>}
+          {(typeOfUser.type!=="College" && !loggedIn.loggedInAsCollege)&& <th>Update</th>}
+          {(typeOfUser.type!=="College" && !loggedIn.loggedInAsCollege)&&<th>Delete</th>}
+          {(typeOfUser.type==="College" || loggedIn.loggedInAsCollege) &&<th>Upload Result</th>}
         </tr>
       </thead>
       <tbody>
         
      {studentList.map((student)=>{
-        return (
-            <tr key={student.Email}>
-             <td><img className={Styles.zoomImage} src={student.Photo}></img></td>
-             <td>{student.Name} </td>
-             <td>{student.Email} </td>
-             {typeOfUser.type!=="College" && <td>{student.College?.Name} </td>}
-             <td>{student.Department?.Name}</td>
-             <td>{student.Sem}</td>
-             <td>{student.Birthday}</td>
-             {typeOfUser.type!=="College"&& <td> <Button type="submit" msg="Update" className="btn btn-primary"onClick={()=>handleUpdateStudent(student._id)}/></td>}
-            {typeOfUser.type!=="College"  && <td><Button type="submit" msg="Delete" className="btn btn-danger" onClick={()=>handleDeleteStudent(student)}/></td>}
-            {typeOfUser.type==="College"&& <td> <Button type="submit" msg="Upload" className="btn btn-primary"onClick={()=>handleAddResult(student._id)}/></td>}
+        return (<>
+          { !student.Alumni &&  < tr key={student.Email}>
+             <td className={student.College?.BlackListed && "text-muted"}><img className={Styles.zoomImage} src={student.Photo}></img></td>
+             <td className={student.College?.BlackListed && "text-muted"}>{student.Name} </td>
+             <td className={student.College?.BlackListed && "text-muted"}>{student.Email} </td>
+             {(typeOfUser.type!=="College"  && !loggedIn.loggedInAsCollege) &&<td className={student.College?.BlackListed && "text-muted"}>{student.College?.Name} </td>}
+             <td className={student.College?.BlackListed && "text-muted"}>{student.Department?.Name}</td>
+             <td className={student.college?.BlackListed && "text-muted"}>{student.Sem}</td>
+             <td className={student.college?.BlackListed && "text-muted"}>{student.Birthday}</td>
+             {(typeOfUser.type!=="College"  && !loggedIn.loggedInAsCollege) && <td> <Button disabled={student.College?.BlackListed} type="submit" msg="Update" className="btn btn-primary"onClick={()=>handleUpdateStudent(student._id)}/></td>}
+            {(typeOfUser.type!=="College"  && !loggedIn.loggedInAsCollege)  && <td ><Button type="submit" disabled={student.College?.BlackListed} msg="Delete" className="btn btn-danger" onClick={()=>handleDeleteStudent(student)}/></td>}
+            {(typeOfUser.type==="College"  || loggedIn.loggedInAsCollege) && <td> <Button type="submit" msg="Upload" className= "btn btn-primary"onClick={()=>handleAddResult(student._id)}/></td>}
       
        </tr>
-        )
+     }</>)
      })}
      </tbody>
      </Table>

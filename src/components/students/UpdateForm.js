@@ -3,17 +3,21 @@ import axios from "axios";
 import Button from "../Button";
 import InputController from "../InputController";
 import Styles from "../StudentForm.module.css";
+import { useSelector } from "react-redux";
 
 function UpdateForm(props) {
-  const [studentDetails, setStudentDetails] = useState([]);
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  const typeOfUser=userState.type
   const [fieldToBeUpdated, setFieldToBeUpdated] = useState("");
   const [error, setError] = useState({});
-  const[studentNumberUpdate,setStudentNumberUpdate]=useState({id:props.typeOfUser.id,currentNumber:"",newNumber:"",confirmNumber:""});
-  const[studentEmailUpdate,setStudentEmailUpdate]=useState({id:props.typeOfUser.id,currentEmail:"",newEmail:"",confirmEmail:""});
-
-
+  const[studentNumberUpdate,setStudentNumberUpdate]=useState({id:typeOfUser.id,currentNumber:"",newNumber:"",confirmNumber:""});
+  const[studentEmailUpdate,setStudentEmailUpdate]=useState({id:typeOfUser.id,currentEmail:"",newEmail:"",confirmEmail:""});
+  const [notMatch,setNotMatch]=useState("");
+ 
   // const getStudent=()=>{
-  //   const id=props.typeOfUser.id;
+  //   const id=typeOfUser.id;
   //   axios.post("http://localhost:8080/api/fetchOneStudent",{id})
   //     .then(response=>{
   //       //  console.log(response.data)
@@ -23,13 +27,19 @@ function UpdateForm(props) {
   const handleUpdateStudentFrom=(e)=>{
     e.preventDefault();
     setError({});
+    setNotMatch(false);
     let validationError=false;
     if(props.mobileNoUpdate){
-    console.log(props.studentNumberUpdate)
+    console.log(studentNumberUpdate)
     if (studentNumberUpdate?.currentNumber === "") {
       setError((prev) => ({ ...prev, currentNumber: "Current Number is required!" }));
       validationError=true;
     }
+    else if (studentNumberUpdate?.currentNumber !=props.studentDetails?.Mobile) {
+      setError((prev) => ({ ...prev, currentNumber: "Current Number do not match!" }));
+      validationError=true;
+    }
+
     else if(studentNumberUpdate?.currentNumber.length!=10){
       setError((prev) => ({ ...prev, currentNumber: "Enter Valid number" }));
       validationError=true;
@@ -51,9 +61,14 @@ function UpdateForm(props) {
       setError((prev) => ({ ...prev,confirmNumber: "Enter Valid number" }));
       validationError=true;
     } 
+    if(studentNumberUpdate?.confirmNumber!==studentNumberUpdate?.newNumber){
+      setNotMatch("Number do not match" );
+      validationError=true;
+    }
    
     if(!validationError){ 
       try{
+        console.log("studentNumberUpdate")
         axios.post("http://localhost:8080/api/updateMobile",studentNumberUpdate)
         .then(response=>{
           console.log(response.data);
@@ -71,10 +86,10 @@ function UpdateForm(props) {
       setError((prev) => ({ ...prev, currentEmail: "Current Email is required!" }));
       validationError=true;
     }
-    // else if(studentEmailUpdate?.currentEmail.length!=10){
-    //   setError((prev) => ({ ...prev, currentEmail: "Enter Valid Email" }));
-    //   validationError=true;
-    // } 
+    else if(studentEmailUpdate?.currentEmail!=props.studentDetails?.Email){
+      setError((prev) => ({ ...prev, currentEmail: "Current email do not match" }));
+      validationError=true;
+    } 
     if (studentEmailUpdate.newEmail === "") {
    
       setError((prev) => ({ ...prev, newEmail: "New Email required!" }));
@@ -86,6 +101,10 @@ function UpdateForm(props) {
     // }
     if (studentEmailUpdate.confirmEmail === "") {   
       setError((prev) => ({ ...prev, confirmEmail: "Have to confirm the new Email!" }));
+      validationError=true;
+    }
+    if(studentEmailUpdate.confirmEmail!==studentEmailUpdate.newEmail){
+      setNotMatch("Email do not match" );
       validationError=true;
     }
     // else if(studentEmailUpdate?.confirmEmail.length!=10){
@@ -189,6 +208,7 @@ function UpdateForm(props) {
           onChange={(event)=>setStudentEmailUpdate({...studentEmailUpdate,confirmEmail:event.target.value})}
         /></div>
           }
+            {notMatch && <p className="fs-5 fw-bold text-center text-danger m-0">{notMatch}</p>}
            <div className="d-grid mt-2">
               <Button
                 msg="Submit"

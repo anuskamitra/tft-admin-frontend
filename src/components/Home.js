@@ -13,6 +13,8 @@ import Result from "./students/StudentResult"
 import UpdateForm from "./students/UpdateForm";
 import { useDispatch } from 'react-redux';
 import { typeOfUser } from "../store/slices/UserSlice";
+import Alumni from "./Alumni";
+import Calander from "./Calander";
 function Home(){
    const Navigate=useNavigate();
    const dispatch = useDispatch();
@@ -31,6 +33,7 @@ function Home(){
                name:user.name,
                sem:user.sem
             }
+
             dispatch(typeOfUser(userInfo))
             
          
@@ -44,20 +47,26 @@ function Home(){
    const[showProfile,setShowProfile]=useState(false)
    const[showResult,setShowResult]=useState(false)
    const [showUpdateForm,setShowUpdateForm]=useState(false)
+   const [showAlumniList,setShowAlumniList]=useState(false)
+   const[showCalander,setShowCalander]=useState(false);
+   const[chosenYear,setChosenYear]=useState("");
  return (
    <React.Fragment>
       <div className="d-flex">
     <div className={Styles.LeftBar}>
-    <LeftBar showStudentList={showStudentList} setShowStudentList={setShowStudentList} showCollegeList={showCollegeList} setShowCollegeList={setShowCollegeList} setShowDepartmentList={setShowDepartmentList} showDepartmentList={showDepartmentList} setShowSummaryList={setShowSummaryList} showSummaryList={showSummaryList} showProfessorList={showProfessorList} setShowProfessorList={setShowProfessorList} showProfile={showProfile} setShowProfile={setShowProfile} showResult={showResult} setShowResult={setShowResult} showUpdateForm={showUpdateForm} setShowUpdateForm={setShowUpdateForm}/></div>
+    <LeftBar setShowCalander={setShowCalander} showCalander={showCalander} showStudentList={showStudentList} chosenYear={chosenYear} setChosenYear={setChosenYear} setShowStudentList={setShowStudentList} showCollegeList={showCollegeList} setShowCollegeList={setShowCollegeList} setShowDepartmentList={setShowDepartmentList} showDepartmentList={showDepartmentList} setShowSummaryList={setShowSummaryList} showSummaryList={showSummaryList} showProfessorList={showProfessorList} setShowProfessorList={setShowProfessorList} showProfile={showProfile} setShowProfile={setShowProfile} showResult={showResult} setShowResult={setShowResult} showUpdateForm={showUpdateForm} setShowUpdateForm={setShowUpdateForm} showAlumniList={showAlumniList} setShowAlumniList={setShowAlumniList}/></div>
     <div className={Styles.rightContent} > 
      {showStudentList ?<Students/>:
       showCollegeList?<CollegeList/>:
-   //   showDepartmentList?<DepartmentList typeOfUser={typeOfUser}/>:
-   //   showSummaryList?<Summary typeOfUser={typeOfUser}/>:
-   //   showProfessorList?<ProfessorList typeOfUser={typeOfUser}/>:
-   //   showProfile?<PersonalDetails typeOfUser={typeOfUser}/>:
-   //   showResult?<Result  typeOfUser={typeOfUser} />: 
-   //   showUpdateForm?<UpdateForm  typeOfUser={typeOfUser}/>:
+     showDepartmentList?<DepartmentList/>:
+     showSummaryList?<Summary/>:
+     showProfessorList?<ProfessorList />:
+      showProfile?<PersonalDetails/>:
+     showResult?<Result/>: 
+     showAlumniList?<Alumni chosenYear={chosenYear}/>:
+     showCalander?<Calander/>:
+
+     //showUpdateForm?<UpdateForm  typeOfUser={typeOfUser}/>:
      <div className={Styles.nothing}>
       <p>Choose a list from</p>
       <p>the modules to </p>

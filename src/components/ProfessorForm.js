@@ -3,9 +3,20 @@ import Styles from "./StudentForm.module.css";
 import axios from "axios";
 import Button from "./Button";
 import InputController from "./InputController";
+import { useSelector } from "react-redux";
+
+
 function ProfessorForm(props) {
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  
+  const typeOfUser=userState.type;
+  const loggedIn=userState.loggedIn
+
   const [pic, setPic] = useState("");
   const [error, setError] = useState({});
+
   const [collegeList, setCollegeList] = useState([]);
   const [professorExistsError, setProfessorExistsError] = useState("");
   let selectedCollegeId = "";
@@ -15,8 +26,8 @@ function ProfessorForm(props) {
   var namePattern = /^[a-zA-Z.\s]+$/;
   const getCollege = () => {
     try {
-      if (props.typeOfUser.type === "College") {
-        const collegeId = props.typeOfUser.id;
+      if (typeOfUser.type === "College") {
+        const collegeId = typeOfUser.id;
         axios
           .post("http://localhost:8080/college/fetchonecollege", { collegeId })
           .then((response) => {
@@ -227,7 +238,7 @@ function ProfessorForm(props) {
             }
           />
 
-          {props.typeOfUser.type === "College" ? (
+          {(typeOfUser.type === "College"||loggedIn.loggedInAsCollege) ? (
             ""
           ) : (
             <div>
@@ -263,7 +274,7 @@ function ProfessorForm(props) {
 
           <label className="fw-2">
             Department name<span style={{ color: "red" }}>*</span>
-            {props.typeOfUser.type !== "College" && (
+            {(typeOfUser.type !== "College" && loggedIn.loggedInAsCollege) && (
               <span style={{ fontSize: "12px", color: "red" }}>
                 {" "}
                 (Please first select college to see the available departments)
@@ -282,10 +293,10 @@ function ProfessorForm(props) {
             }
           >
             <option value={props.professorDetails?.Department||""}>{props.professorDetails?.SelectedDepartment?.Name||"Select one Department"}</option>
-  
-            {props.professorDetails.SelectedCollege?.Departments?.map(
+           { props.professorDetails.SelectedCollege?.Departments?.map(
               (department) => {
-                return (
+                if(department.Name!=props.professorDetails?.SelectedDepartment?.Name)
+                return (  
                   <option key={department._id} value={department._id}>{department.Name}</option>
                 );
               }

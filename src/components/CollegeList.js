@@ -4,17 +4,26 @@ import Button from "./Button.js"
 import axios from "axios"
 import Styles from "./Students.module.css"
 import CollegeForm from './CollegeForm.js';
+import { useDispatch } from 'react-redux'
+import {loggedInAsCollege} from '../store/slices/UserSlice.js'
+import { useNavigate } from 'react-router-dom'
+import Summary from './Summary.js'
+
 
 
 export default function CollegeList() {
+  const Navigate=useNavigate();
     const [collegeList,setCollegeList]=useState([]);
     const [update,setUpdate]=useState(false);
     const [showCollegeForm,setShowCollegeForm]=useState(false);
+    const[showSummary,setShowSummary]=useState(false);
     const [collegeDetails,setCollegeDetails]=useState({id:"",Name:"", Email:"",Password:"",State:"",City:"", Rating:"",Departments:[]})
+    const dispatch=useDispatch();
     const getCollege=()=>{ 
   try{
     axios.get("http://localhost:8080/college/fetchcolleges")
     .then(response=>{
+      console.log("called")
         setCollegeList(response.data);
     })
   }catch(err){
@@ -54,14 +63,61 @@ const handleUpdateCollege=(id)=>{
         setUpdate(true);
     })
 }
-const handleDetails=()=>{
-  console.log("Details")
+const handleDetails=(college)=>{
+  console.log(college);
+  const loggedInAs={
+    loggedInAsCollege:true,
+    collegeId:college._id,
+    collegeName:college.Name
+  }
+  console.log(loggedInAs);
+  dispatch(loggedInAsCollege(loggedInAs))
+ setShowSummary(true);
+
+}
+const handleBlockCollege=async(college)=>{
+      const sureBlock=window.confirm(`Are you sure want to Black list ${college.Name}?`);
+  if(sureBlock){
+    let id=college._id
+    const details={
+      id:id,
+      blackListed:true
+    }
+   const result= await axios.post("http://localhost:8080/college/block",details)
+   if(result){
+    console.log(result)
+    getCollege()
+   }
+  }
+  else{
+    return
+  }
+}
+const handleUnBlockCollege=async(college)=>{
+  const sureUnBlock=window.confirm(`Are you sure want to Unblock ${college.Name}?`);
+  if(sureUnBlock){
+    let id=college._id
+    const details={
+      id:id,
+      blackListed:false
+    }
+   const result= await axios.post("http://localhost:8080/college/block",details)
+   if(result){
+    console.log(result)
+    getCollege();
+   }
+  }
+  else{
+    return
+  }
 }
 useEffect(()=>{
  getCollege();
 },[])
   return (
     <div>
+      {showSummary ?<Summary/>:
+      <>
        <h3 className='text-center'> College List</h3>
        <p className="mt-2 text-center text-success">To add a new College  <Button className="btn btn-success" msg="Add" type="submit" onClick={()=>setShowCollegeForm(true)}  /></p>
        {showCollegeForm && <CollegeForm collegeDetails={collegeDetails} setCollegeDetails={setCollegeDetails} setShowCollegeForm={setShowCollegeForm} getCollege={getCollege} update={update} setUpdate={setUpdate} />}
@@ -74,36 +130,37 @@ useEffect(()=>{
           <th>State</th>
           <th>City</th> 
           <th>Departments</th>
-          <th>Ratings</th>
+          <th>BlackList</th>
           <th>Update</th>
           <th>Details</th>
           <th>Delete</th>
         </tr>
       </thead>
       <tbody>
-        {collegeList.map((college)=>{
+        {collegeList.map((college,index)=>{
             return(
-            <tr key={college.Email}>
-                <td>{college.Name}</td>
-                <td>{college.Email}</td>
-                <td>{college.State}</td>
-                <td>{college.City}</td>
-                <td>{college.Departments.map((dep=>{
-                 return <ul className="list-unstyled">
+           
+            <tr key={index} >
+              {console.log(college.BlackListed)}
+                <td className={college?.BlackListed && "text-muted font-italic"}>{college.Name}</td>
+                <td className={college?.BlackListed && "text-muted"}>{college.Email}</td>
+                <td className={college?.BlackListed && "text-muted"}>{college.State}</td>
+                <td className={college?.BlackListed && "text-muted"}>{college.City}</td>
+                <td className={college?.BlackListed && "text-muted"}>{college.Departments.map(((dep,index)=>{
+                 return <ul key={index} className="list-unstyled">
                   <li className='decoration-none'>{dep.Name}</li></ul>
                 }))}</td>
-                <td>{college.Rating}</td>
-                <td> <Button type="submit" msg="Update" className="btn btn-primary"onClick={()=>handleUpdateCollege(college._id)}/></td>
-                <td><Button type="submit" msg="View" className="btn btn-info" onClick={()=>handleDetails(college)}/></td>
-            <td><Button type="submit" msg="Delete" className="btn btn-danger" onClick={()=>handleDeleteCollege(college)}/></td>
-
+                <td className={college?.BlackListed && "text-muted"}> {!college.BlackListed?<Button type="submit" msg="Block" className="btn btn-dark"onClick={()=>handleBlockCollege(college)}/>:<Button type="submit" msg="Unblock" className="btn btn-light"onClick={()=>handleUnBlockCollege(college)}/>}</td>
+                <td className={college?.BlackListed && "text-muted"}> <Button type="submit" msg="Update"disabled={college.BlackListed} className="btn btn-primary"onClick={()=>handleUpdateCollege(college._id)}/></td>
+                <td className={college?.BlackListed && "text-muted"}><Button type="submit" msg="View" disabled={college.BlackListed} className="btn btn-info" onClick={()=>handleDetails(college)}/></td>
+            <td className={college?.BlackListed && "text-muted"}><Button type="submit" msg="Delete" disabled={college.BlackListed} className="btn btn-danger" onClick={()=>handleDeleteCollege(college)}/></td>
             </tr>
             )
         })}
      </tbody>
     
         </Table>
-        </div>
+        </div></>}
 
     </div>
   )
