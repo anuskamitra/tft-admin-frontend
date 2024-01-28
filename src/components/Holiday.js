@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import Table from "react-bootstrap/esm/Table";
 import InputController from "./InputController";
 
-function Calander() {
+function Holiday() {
   const userState = useSelector((state) => {
     return state.user;
   });
@@ -44,14 +44,14 @@ function Calander() {
         console.log(response.data.College._id);
            collegeId = response.data.College._id;
       } else {
-         collegeId = typeOfUser.id;
+         collegeId = loggedIn.collegeId;
         }
         console.log(collegeId);
         axios
           .post("http://localhost:8080/college/fetchonecollege", { collegeId })
           .then((response) => {
             console.log("called");
-            console.log(response.data.Holidays);
+            console.log(response.data);
             setHolidayList(response.data.Holidays);
           });
       }
@@ -118,7 +118,12 @@ function Calander() {
 
   useEffect(() => {
     getCollege();
+    console.log("Hello");
   }, []);
+  useEffect(()=>{
+ console.log(holidayList)
+
+  },[holidayList])
   return (
     <div >
      
@@ -211,4 +216,4 @@ function Calander() {
   );
 }
 
-export default Calander;
+export default Holiday;

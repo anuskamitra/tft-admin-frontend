@@ -14,7 +14,8 @@ import UpdateForm from "./students/UpdateForm";
 import { useDispatch } from 'react-redux';
 import { typeOfUser } from "../store/slices/UserSlice";
 import Alumni from "./Alumni";
-import Calander from "./Calander";
+import Holiday from "./Holiday";
+import QuestionPapers from "./QuestionPapers";
 function Home(){
    const Navigate=useNavigate();
    const dispatch = useDispatch();
@@ -30,6 +31,8 @@ function Home(){
                type:user.typeOfUser,
                email:user.email,
                id:user._id,
+               department:user.department,
+               college:user.college,
                name:user.name,
                sem:user.sem
             }
@@ -48,13 +51,14 @@ function Home(){
    const[showResult,setShowResult]=useState(false)
    const [showUpdateForm,setShowUpdateForm]=useState(false)
    const [showAlumniList,setShowAlumniList]=useState(false)
-   const[showCalander,setShowCalander]=useState(false);
+   const[showHoliday,setShowHoliday]=useState(false);
    const[chosenYear,setChosenYear]=useState("");
+   const [showQuestionPaper,setShowQuestionPaper]=useState(false)
  return (
    <React.Fragment>
       <div className="d-flex">
     <div className={Styles.LeftBar}>
-    <LeftBar setShowCalander={setShowCalander} showCalander={showCalander} showStudentList={showStudentList} chosenYear={chosenYear} setChosenYear={setChosenYear} setShowStudentList={setShowStudentList} showCollegeList={showCollegeList} setShowCollegeList={setShowCollegeList} setShowDepartmentList={setShowDepartmentList} showDepartmentList={showDepartmentList} setShowSummaryList={setShowSummaryList} showSummaryList={showSummaryList} showProfessorList={showProfessorList} setShowProfessorList={setShowProfessorList} showProfile={showProfile} setShowProfile={setShowProfile} showResult={showResult} setShowResult={setShowResult} showUpdateForm={showUpdateForm} setShowUpdateForm={setShowUpdateForm} showAlumniList={showAlumniList} setShowAlumniList={setShowAlumniList}/></div>
+    <LeftBar showQuestionPaper={showQuestionPaper} setShowQuestionPaper={setShowQuestionPaper} setShowHoliday={setShowHoliday} showHoliday={showHoliday} showStudentList={showStudentList} chosenYear={chosenYear} setChosenYear={setChosenYear} setShowStudentList={setShowStudentList} showCollegeList={showCollegeList} setShowCollegeList={setShowCollegeList} setShowDepartmentList={setShowDepartmentList} showDepartmentList={showDepartmentList} setShowSummaryList={setShowSummaryList} showSummaryList={showSummaryList} showProfessorList={showProfessorList} setShowProfessorList={setShowProfessorList} showProfile={showProfile} setShowProfile={setShowProfile} showResult={showResult} setShowResult={setShowResult} showUpdateForm={showUpdateForm} setShowUpdateForm={setShowUpdateForm} showAlumniList={showAlumniList} setShowAlumniList={setShowAlumniList}/></div>
     <div className={Styles.rightContent} > 
      {showStudentList ?<Students/>:
       showCollegeList?<CollegeList/>:
@@ -64,7 +68,8 @@ function Home(){
       showProfile?<PersonalDetails/>:
      showResult?<Result/>: 
      showAlumniList?<Alumni chosenYear={chosenYear}/>:
-     showCalander?<Calander/>:
+     showHoliday?<Holiday/>:
+     showQuestionPaper?<QuestionPapers/>:
 
      //showUpdateForm?<UpdateForm  typeOfUser={typeOfUser}/>:
      <div className={Styles.nothing}>

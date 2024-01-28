@@ -130,7 +130,6 @@ function Cards(props) {
             type="file"
             accept="application/pdf"
             id="resultInput"
-            //   style={{ display: "none" }}
             onChange={(e) => {
               setResult(e.target.files[0]);
             

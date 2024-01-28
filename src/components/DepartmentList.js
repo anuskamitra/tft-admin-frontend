@@ -45,7 +45,7 @@ function DepartmentList(props) {
           .post(backendURL + "/department/delete", departmentDetails)
           .then((response) => {
             console.log(response);
-            // getDepartment();
+             getDepartment();
           });
       }
     }
@@ -90,6 +90,7 @@ function DepartmentList(props) {
           .get("http://localhost:8080/department/fetchdepartments")
           .then((response) => {
             setDepartmentList(response.data);
+            console.log(response.data)
           });
       } catch (err) {
         console.log(err);

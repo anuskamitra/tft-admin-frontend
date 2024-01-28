@@ -238,6 +238,7 @@ const uploadPic=async()=>{
         <form className="mt-2">
           <InputController
            type="file"
+            
            name="photo"
            accept=".jpeg, .png, .jpg"
            error={error.photo}
