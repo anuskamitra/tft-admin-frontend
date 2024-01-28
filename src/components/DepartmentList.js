@@ -21,7 +21,7 @@ function DepartmentList(props) {
     Name: "",
   });
   const [update, setUpdate] = useState(false);
-  const backendURL = "http://localhost:8080";
+  const backendURL = process.env.REACT_APP_BACKEND_URL+"";
   const handleDeleteDepartment = async (departmentDetails) => {
     const shouldDelete = window.confirm(
       "Are you sure you want to delete The Department?"
@@ -76,7 +76,7 @@ function DepartmentList(props) {
       console.log(collegeId);
       try { 
         axios
-          .post("http://localhost:8080/college/fetchdepartments", { collegeId })
+          .post(process.env.REACT_APP_BACKEND_URL+"/college/fetchdepartments", { collegeId })
           .then((response) => {
             console.log(response.data);
             setDepartmentList(response.data);
@@ -87,7 +87,7 @@ function DepartmentList(props) {
     } else {
       try {
         axios
-          .get("http://localhost:8080/department/fetchdepartments")
+          .get(process.env.REACT_APP_BACKEND_URL+"/department/fetchdepartments")
           .then((response) => {
             setDepartmentList(response.data);
             console.log(response.data)

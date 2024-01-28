@@ -19,7 +19,7 @@ function Alumni(props) {
       const fetchAlumni=async()=>{
         try{
             console.log(year)
-            axios.post("http://localhost:8080/api/fetchAlumni",{year})
+            axios.post(process.env.REACT_APP_BACKEND_URL+"/api/fetchAlumni",{year})
             .then(response=>{
                 const data=response.data;
               console.log(data)

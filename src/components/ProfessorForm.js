@@ -29,7 +29,7 @@ function ProfessorForm(props) {
       if (typeOfUser.type === "College") {
         const collegeId = typeOfUser.id;
         axios
-          .post("http://localhost:8080/college/fetchonecollege", { collegeId })
+          .post(process.env.REACT_APP_BACKEND_URL+"/college/fetchonecollege", { collegeId })
           .then((response) => {
             let data = response.data;
             props.setProfessorDetails({
@@ -40,7 +40,7 @@ function ProfessorForm(props) {
           });
       } else {
         axios
-          .get("http://localhost:8080/college/fetchcolleges")
+          .get(process.env.REACT_APP_BACKEND_URL+"/college/fetchcolleges")
           .then((response) => {
             console.log(response);
             setCollegeList(response.data);
@@ -82,7 +82,7 @@ function ProfessorForm(props) {
     try{
       await uploadPic()
       axios
-      .post("http://localhost:8080/professor/update", details)
+      .post(process.env.REACT_APP_BACKEND_URL+"/professor/update", details)
       .then((response) => {
         console.log(response.data);
         props.getProfessor();
@@ -156,7 +156,7 @@ function ProfessorForm(props) {
       await uploadPic();
       console.log(details)
       axios
-        .post("http://localhost:8080/professor/addnew", details)
+        .post(process.env.REACT_APP_BACKEND_URL+"/professor/addnew", details)
         .then((response) => {
           console.log(response.data);
           props.getProfessor();

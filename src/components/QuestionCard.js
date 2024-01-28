@@ -3,12 +3,20 @@ import InputController from "./InputController";
 import Button from "./Button";
 import axios from "axios";
 import { LuView } from "react-icons/lu";
+import { useSelector } from "react-redux";
+
 
 
 function Card(props) {
   const [showInput, setShowInput] = useState(false);
   const [paper, setPaper] = useState("");
 
+  const userState=useSelector((state)=>{
+    return state.user
+  })
+  
+  const typeOfUser=userState.type;
+  
   const viewPaper = (url) => {
     console.log("hello");
     const pdfURL = url;
@@ -26,7 +34,7 @@ function Card(props) {
     const confirm = window.confirm("Are you sure, you want to delete?");
     if (confirm) {
       const response = await axios.post(
-        "http://localhost:8080/samplePaper/deletePaper",
+        process.env.REACT_APP_BACKEND_URL+"/samplePaper/deletePaper",
         { id }
       );
       console.log(response);
@@ -49,13 +57,13 @@ function Card(props) {
                 <LuView className="text-success" />
               </button>
             </div>
-            <div>
+            {typeOfUser.type!=="Student" && <div>
               {" "}
               <button className="btn " onClick={() => deletePaper(props.id)}>
                 {" "}
                 <i class="bi bi-trash text-danger"></i>
               </button>
-            </div>
+            </div>}
           </div>
         )}
 

@@ -21,7 +21,7 @@ function CollegeForm(props) {
     }
     const getDepartment=()=>{
       try{
-          axios.get("http://localhost:8080/department/fetchdepartments")
+          axios.get(process.env.REACT_APP_BACKEND_URL+"/department/fetchdepartments")
           .then(response=>{
               setDepartmentList(response.data);
           })
@@ -85,7 +85,7 @@ function CollegeForm(props) {
       if(!validationError){
         setError({})
       try{
-        axios.post("http://localhost:8080/college/addnew",details)
+        axios.post(process.env.REACT_APP_BACKEND_URL+"/college/addnew",details)
         .then(response=>{
               console.log(response.data);
             if(response.data==="alreadyexist"){
@@ -144,7 +144,7 @@ function CollegeForm(props) {
         props.setShowCollegeForm(false) 
         props.setUpdate(false);
         console.log(details)
-       axios.post("http://localhost:8080/college/update",details)
+       axios.post(process.env.REACT_APP_BACKEND_URL+"/college/update",details)
        .then(response=>{
           console.log(response);
           props.getCollege();

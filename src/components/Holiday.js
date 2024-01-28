@@ -38,7 +38,7 @@ function Holiday() {
       if (typeOfUser.type === "Student") {
         const id = typeOfUser.id;
         const response = await axios.post(
-          "http://localhost:8080/api/fetchOneStudent",
+          process.env.REACT_APP_BACKEND_URL+"/api/fetchOneStudent",
           { id }
         );
         console.log(response.data.College._id);
@@ -48,7 +48,7 @@ function Holiday() {
         }
         console.log(collegeId);
         axios
-          .post("http://localhost:8080/college/fetchonecollege", { collegeId })
+          .post(process.env.REACT_APP_BACKEND_URL+"/college/fetchonecollege", { collegeId })
           .then((response) => {
             console.log("called");
             console.log(response.data);
@@ -101,7 +101,7 @@ function Holiday() {
       Reason: holidayDetails.Reason,
     };
     const response = await axios.post(
-      "http://localhost:8080/college/addHoliday",
+      process.env.REACT_APP_BACKEND_URL+"/college/addHoliday",
       details
     );
     console.log(response);

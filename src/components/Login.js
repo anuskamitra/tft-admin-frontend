@@ -45,7 +45,7 @@ function Login() {
       if(!validationError){
         if(userDetails.typeOfUser==="admin"){
           try{
-            axios.post("http://localhost:8080/user/login",userDetails)
+            axios.post(process.env.REACT_APP_BACKEND_URL+"/user/login",userDetails)
             .then(response=>{
               if(response.status===201){
                 localStorage.setItem("userInfo",JSON.stringify(response.data))
@@ -66,7 +66,7 @@ function Login() {
         }
         else if(userDetails.typeOfUser==="student"){
           try{
-          axios.post("http://localhost:8080/api/login",userDetails)
+          axios.post(process.env.REACT_APP_BACKEND_URL+"/api/login",userDetails)
           .then(response=>{
             console.log(response)
             if(response.status===201){
@@ -92,7 +92,7 @@ function Login() {
         else{
           console.log("loggedin as college")
           try{
-            axios.post("http://localhost:8080/college/login",userDetails)
+            axios.post(process.env.REACT_APP_BACKEND_URL+"/college/login",userDetails)
             .then(response=>{
               if(response.status===201){
                 localStorage.setItem("userInfo",JSON.stringify(response.data))

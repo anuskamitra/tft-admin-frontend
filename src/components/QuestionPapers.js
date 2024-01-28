@@ -30,7 +30,7 @@ function QuestionPapers() {
   const [paper, setPaper] = useState("");
 
   const sem = [1, 2, 3, 4, 5, 6, 7, 8];
-  const backEndURL = "http://localhost:8080";
+  const backEndURL = process.env.REACT_APP_BACKEND_URL+"";
 
 
   const getCollege = async () => {
@@ -39,7 +39,7 @@ function QuestionPapers() {
       if (typeOfUser.type === "Student") {
         const id = typeOfUser.id;
         const response = await axios.post(
-          "http://localhost:8080/api/fetchOneStudent",
+          process.env.REACT_APP_BACKEND_URL+"/api/fetchOneStudent",
           { id }
         );
         console.log(response.data.College._id);
@@ -53,7 +53,7 @@ function QuestionPapers() {
       console.log(collegeId);
       setChosenCollege(collegeId);
       axios
-        .post("http://localhost:8080/college/fetchonecollege", { collegeId })
+        .post(process.env.REACT_APP_BACKEND_URL+"/college/fetchonecollege", { collegeId })
         .then((response) => {
           console.log("called");
           console.log(response.data);

@@ -48,7 +48,7 @@ const[studentDetails,setStudentDetails]=useState({
  
   console.log(typeOfUser)
 
-const backendURL="http://localhost:8080";
+const backendURL=process.env.REACT_APP_BACKEND_URL+"";
 
 const getStudent=async()=>{
   console.log("hello");
@@ -62,7 +62,7 @@ const getStudent=async()=>{
      collegeId=loggedIn.collegeId
    }
     try{
-      axios.post("http://localhost:8080/api/fetchStudents",{collegeId})
+      axios.post(process.env.REACT_APP_BACKEND_URL+"/api/fetchStudents",{collegeId})
       .then(response=>{
           const data=response.data;
         console.log(data)
@@ -76,7 +76,7 @@ const getStudent=async()=>{
   else{
     console.log("in else")
     try{
-      axios.get("http://localhost:8080/api/fetchStudents")
+      axios.get(process.env.REACT_APP_BACKEND_URL+"/api/fetchStudents")
       .then(response=>{
           const data=response.data;
           setStudentList(data);       
@@ -90,7 +90,7 @@ const getStudent=async()=>{
 const getCollege = () => {
     try {
       axios
-        .get("http://localhost:8080/college/fetchcolleges")
+        .get(process.env.REACT_APP_BACKEND_URL+"/college/fetchcolleges")
         .then((response) => {
           setCollegeList(response.data);
         });

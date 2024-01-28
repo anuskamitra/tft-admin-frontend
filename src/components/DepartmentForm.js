@@ -14,7 +14,7 @@ export default function DepartmentForm(props) {
  
   const getDepartment=()=>{
       try{
-        axios.get("http://localhost:8080/department/fetchdepartments")
+        axios.get(process.env.REACT_APP_BACKEND_URL+"/department/fetchdepartments")
         .then(response=>{
             setDepartmentList(response.data);
         })
@@ -47,7 +47,7 @@ export default function DepartmentForm(props) {
       if(props.typeOfUser.type==="College"){
         const details={...props.departmentDetails,id:props.typeOfUser.id}
         try{
-        axios.post("http://localhost:8080/college/department/addnew",details)
+        axios.post(process.env.REACT_APP_BACKEND_URL+"/college/department/addnew",details)
           .then(response=>{
             console.log(response.data)
             props.getDepartment();
@@ -66,7 +66,7 @@ export default function DepartmentForm(props) {
       else{
       try {
         axios
-          .post("http://localhost:8080/department/addnew", props.departmentDetails)
+          .post(process.env.REACT_APP_BACKEND_URL+"/department/addnew", props.departmentDetails)
           .then((response) => {
             // console.log(response.data);
             if (response.data === "DepartmentFound") {
@@ -106,7 +106,7 @@ export default function DepartmentForm(props) {
       try {
         console.log(props.departmentDetails);
         axios
-          .post("http://localhost:8080/department/update", props.departmentDetails)
+          .post(process.env.REACT_APP_BACKEND_URL+"/department/update", props.departmentDetails)
           .then((response) => {
             console.log(response);
             props.getDepartment();

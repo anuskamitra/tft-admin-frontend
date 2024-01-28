@@ -16,10 +16,9 @@ function PersonalDetails(props) {
   const [mobileNoUpdate, setMobileNoUpdate] = useState(false);
   const [emailUpdate, setEmailUpdate] = useState(false);
   const getStudent = () => {
-    console.log(typeOfUser);
     const id = typeOfUser.id;
     axios
-      .post("http://localhost:8080/api/fetchOneStudent", { id })
+      .post(process.env.REACT_APP_BACKEND_URL+"/api/fetchOneStudent", { id })
       .then((response) => {
         console.log(response.data);
         setStudentDetails(response.data);

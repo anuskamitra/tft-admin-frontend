@@ -21,7 +21,7 @@ export default function CollegeList() {
     const dispatch=useDispatch();
     const getCollege=()=>{ 
   try{
-    axios.get("http://localhost:8080/college/fetchcolleges")
+    axios.get(process.env.REACT_APP_BACKEND_URL+"/college/fetchcolleges")
     .then(response=>{
       console.log("called")
         setCollegeList(response.data);
@@ -36,7 +36,7 @@ const handleDeleteCollege=(college)=>{
   if(!shouldDelete){
     return
   }
-    axios.post("http://localhost:8080/college/delete",college)
+    axios.post(process.env.REACT_APP_BACKEND_URL+"/college/delete",college)
     .then(response=>{
         console.log(response.data);
         getCollege();
@@ -46,7 +46,7 @@ const handleDeleteCollege=(college)=>{
 
 }
 const handleUpdateCollege=(id)=>{
-    axios.post("http://localhost:8080/college/fetchcollegetoupdate",{id})
+    axios.post(process.env.REACT_APP_BACKEND_URL+"/college/fetchcollegetoupdate",{id})
     .then(response=>{
        let college={
         id:response.data._id,
@@ -83,7 +83,7 @@ const handleBlockCollege=async(college)=>{
       id:id,
       blackListed:true
     }
-   const result= await axios.post("http://localhost:8080/college/block",details)
+   const result= await axios.post(process.env.REACT_APP_BACKEND_URL+"/college/block",details)
    if(result){
     console.log(result)
     getCollege()
@@ -101,7 +101,7 @@ const handleUnBlockCollege=async(college)=>{
       id:id,
       blackListed:false
     }
-   const result= await axios.post("http://localhost:8080/college/block",details)
+   const result= await axios.post(process.env.REACT_APP_BACKEND_URL+"/college/block",details)
    if(result){
     console.log(result)
     getCollege();

@@ -18,7 +18,7 @@ function UpdateForm(props) {
  
   // const getStudent=()=>{
   //   const id=typeOfUser.id;
-  //   axios.post("http://localhost:8080/api/fetchOneStudent",{id})
+  //   axios.post(process.env.REACT_APP_BACKEND_URL+"+"/api/fetchOneStudent",{id})
   //     .then(response=>{
   //       //  console.log(response.data)
   //       setStudentDetails(response.data);
@@ -69,7 +69,7 @@ function UpdateForm(props) {
     if(!validationError){ 
       try{
         console.log("studentNumberUpdate")
-        axios.post("http://localhost:8080/api/updateMobile",studentNumberUpdate)
+        axios.post(process.env.REACT_APP_BACKEND_URL+"/api/updateMobile",studentNumberUpdate)
         .then(response=>{
           console.log(response.data);
           clearForm()
@@ -115,7 +115,7 @@ function UpdateForm(props) {
     if(!validationError){ 
       try{
         console.log(studentEmailUpdate)
-        axios.post("http://localhost:8080/api/updateEmail",studentEmailUpdate)
+        axios.post(process.env.REACT_APP_BACKEND_URL+"/api/updateEmail",studentEmailUpdate)
         .then(response=>{
           console.log(response.data);
           clearForm()

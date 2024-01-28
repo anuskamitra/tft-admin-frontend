@@ -29,7 +29,7 @@ function StudentResult(props) {
   const handleDownload = (sem) => {
     console.log("downloaded" + sem);
     const resultTOBeShown = resultList.find((obj) => obj.Title === sem);
-    const url = "http://localhost:8080/files/" + resultTOBeShown.Result;
+    const url = process.env.REACT_APP_BACKEND_URL+"/files/" + resultTOBeShown.Result;
     fetch(url)
       .then((response) => response.blob())
       .then((blob) => {
@@ -50,7 +50,7 @@ function StudentResult(props) {
     const resultTOBeShown = resultList.find((obj) => obj.Title === sem);
     console.log(resultTOBeShown);
     window.open(
-      "http://localhost:8080/files/" + resultTOBeShown.Result,
+      process.env.REACT_APP_BACKEND_URL+"/files/" + resultTOBeShown.Result,
       "_blank",
       "noreferrer"
     );

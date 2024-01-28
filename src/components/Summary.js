@@ -31,7 +31,7 @@ function Summary(props) {
      }
       try{
         console.log(collegeId)
-        axios.post("http://localhost:8080/api/countStudents",{collegeId}).then(response=>{
+        axios.post(process.env.REACT_APP_BACKEND_URL+"/api/countStudents",{collegeId}).then(response=>{
           const data=response.data.length;
           setStudentListLength(data);
         })
@@ -41,7 +41,7 @@ function Summary(props) {
     }
     else{
     try {
-      axios.get("http://localhost:8080/api/fetchStudents").then((response) => {
+      axios.get(process.env.REACT_APP_BACKEND_URL+"/api/fetchStudents").then((response) => {
         const data = response.data.length;;
          setStudentListLength(data);
       });
@@ -53,7 +53,7 @@ function Summary(props) {
   const getCollege = () => {
     try {
       axios
-        .get("http://localhost:8080/college/fetchcolleges")
+        .get(process.env.REACT_APP_BACKEND_URL+"/college/fetchcolleges")
         .then((response) => {
           setCollegeListLength(response.data.length);
         });
@@ -72,13 +72,13 @@ function Summary(props) {
          collegeId=loggedIn.collegeId
        }
    
-        axios.post("http://localhost:8080/college/fetchdepartments",{collegeId})
+        axios.post(process.env.REACT_APP_BACKEND_URL+"/college/fetchdepartments",{collegeId})
         .then(response=>{
           setDepartmentListLength(response.data.length);
         })
     }
     else{
-        axios.get("http://localhost:8080/department/fetchdepartments")
+        axios.get(process.env.REACT_APP_BACKEND_URL+"/department/fetchdepartments")
         .then(response=>{
             setDepartmentListLength(response.data.length);
         })
@@ -98,7 +98,7 @@ const getProfessor = () => {
          collegeId=loggedIn.collegeId
        }
       axios
-        .post("http://localhost:8080/professor/fetchprofessors", {
+        .post(process.env.REACT_APP_BACKEND_URL+"/professor/fetchprofessors", {
           collegeId,
         })
         .then((response) => {
@@ -106,7 +106,7 @@ const getProfessor = () => {
         });
     } else {
       axios
-        .get("http://localhost:8080/professor/fetchprofessors")
+        .get(process.env.REACT_APP_BACKEND_URL+"/professor/fetchprofessors")
         .then((response) => {
           setProfessorListLength(response.data.length);
         });

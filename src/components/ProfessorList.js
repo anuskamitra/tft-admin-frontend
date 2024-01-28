@@ -24,7 +24,7 @@ function TeacherList(props) {
   const getCollege = () => {
     try {  
         axios
-          .get("http://localhost:8080/college/fetchcolleges")
+          .get(process.env.REACT_APP_BACKEND_URL+"/college/fetchcolleges")
           .then((response) => {
             console.log(response);
             setCollegeList(response.data);
@@ -45,7 +45,7 @@ function TeacherList(props) {
          collegeId=loggedIn.collegeId
        }  
         axios
-          .post("http://localhost:8080/professor/fetchprofessors", {
+          .post(process.env.REACT_APP_BACKEND_URL+"/professor/fetchprofessors", {
             collegeId,
           })
           .then((response) => {
@@ -53,7 +53,7 @@ function TeacherList(props) {
           });
       } else {
         axios
-          .get("http://localhost:8080/professor/fetchprofessors")
+          .get(process.env.REACT_APP_BACKEND_URL+"/professor/fetchprofessors")
           .then((response) => {
             setProfessorList(response.data);
           });
@@ -64,7 +64,7 @@ function TeacherList(props) {
   };
   const handleUpdateProf = async(id) => {
     console.log(id);
-    axios.post("http://localhost:8080/professor/fetchprofessortoupdate",{id})
+    axios.post(process.env.REACT_APP_BACKEND_URL+"/professor/fetchprofessortoupdate",{id})
     .then(response=>{
       const profInfo=response.data;
       console.log(response.data)
@@ -87,7 +87,7 @@ function TeacherList(props) {
   };
   const handleDeleteProf = (professor) => {
     try{
-      axios.post("http://localhost:8080/professor/delete",professor)
+      axios.post(process.env.REACT_APP_BACKEND_URL+"/professor/delete",professor)
       .then(response=>{
         console.log(response);
         getProfessor();

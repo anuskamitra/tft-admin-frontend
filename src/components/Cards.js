@@ -79,7 +79,7 @@ function Cards(props) {
 
   }
     const response = await axios.post(
-      "http://localhost:8080/api/uploadResult",
+      process.env.REACT_APP_BACKEND_URL+"/api/uploadResult",
      details
     );
     console.log(response);
@@ -109,7 +109,7 @@ function Cards(props) {
       return ;
     }
     else{
-    await axios.post("http://localhost:8080/api/deleteResult",deleteDetails)
+    await axios.post(process.env.REACT_APP_BACKEND_URL+"/api/deleteResult",deleteDetails)
     .then(response=>{
      setShowView(false);
     setShowSubmitButton(true);;

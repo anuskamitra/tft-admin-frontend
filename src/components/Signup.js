@@ -59,7 +59,7 @@ function Signup() {
       console.log(userDetails);
       try {
         axios
-          .post("http://localhost:8080/user/register", userDetails)
+          .post(process.env.REACT_APP_BACKEND_URL+"/user/register", userDetails)
           .then((response) => {
             if (response.status === 201) {
               localStorage.setItem("userInfo", JSON.stringify(response.data));

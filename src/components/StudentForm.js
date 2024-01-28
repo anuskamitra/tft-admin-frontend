@@ -30,7 +30,7 @@ function StudentForm(props) {
     try {
       if(typeOfUser.type==="College"){
         const collegeId=typeOfUser.id
-        axios.post("http://localhost:8080/college/fetchonecollege",{collegeId})
+        axios.post(process.env.REACT_APP_BACKEND_URL+"/college/fetchonecollege",{collegeId})
         .then(response=>{
           let data=response.data;
           props.setStudentDetails({...props.studentDetails,selectedColl:data})
@@ -38,7 +38,7 @@ function StudentForm(props) {
       }
       else{
       axios
-        .get("http://localhost:8080/college/fetchcolleges")
+        .get(process.env.REACT_APP_BACKEND_URL+"/college/fetchcolleges")
         .then((response) => {
           console.log(response);
           setCollegeName(response.data);
@@ -51,7 +51,7 @@ function StudentForm(props) {
   };
   const getDepartment=()=>{
     try{
-        axios.get("http://localhost:8080/department/fetchdepartments")
+        axios.get(process.env.REACT_APP_BACKEND_URL+"/department/fetchdepartments")
         .then(response=>{
             setDepartmentList(response.data);
         })
@@ -130,7 +130,7 @@ const uploadPic=async()=>{
         await uploadPic();
        console.log(details)
         axios
-          .post("http://localhost:8080/api/addnew", details)
+          .post(process.env.REACT_APP_BACKEND_URL+"/api/addnew", details)
           .then((response) => {
             console.log(response.data);
             if (response.data === "alreadyexist") {
@@ -183,7 +183,7 @@ const uploadPic=async()=>{
        await uploadPic().then(res=>{
       console.log(details)
         axios
-        .post("http://localhost:8080/api/update", details)
+        .post(process.env.REACT_APP_BACKEND_URL+"/api/update", details)
         .then((response) => {
           console.log(response);
           props.getStudent();
