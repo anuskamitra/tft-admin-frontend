@@ -155,8 +155,8 @@ const handleAddResult=async(id)=>{
   .then(response=>{
 
     setSem(response.data.Sem)
-    console.log(response.data)
-    console.log(response.data.Results)
+    // console.log(response.data)
+    // console.log(response.data.Results)
     setResultList(response.data?.Results);
     setIdToUpdate(id);
     setNameOfStudent(response.data.Name)

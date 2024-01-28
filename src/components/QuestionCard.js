@@ -16,7 +16,7 @@ function Card(props) {
     console.log(pdfURL);
 
     window.open(
-      "http://localhost:8080/files/" + pdfURL,
+       pdfURL,
       "_blank",
       "noreferrer"
     );

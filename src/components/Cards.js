@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { LuView } from "react-icons/lu";
 import { TiTick } from "react-icons/ti";
 import { LuUpload } from "react-icons/lu";
@@ -6,6 +7,7 @@ import Styles from "./StudentForm.module.css";
 import axios from "axios";
 import Button from "./Button";
 import InputController from "./InputController";
+import app from "../firebase"
 
 function Cards(props) {
   const [showSubmitButton, setShowSubmitButton] = useState(true);
@@ -13,24 +15,72 @@ function Cards(props) {
   const [title, setTitle] = useState("");
   const[status,setStatus]=useState("");
   const [showInputField, setShowInputField] = useState(false);
+  const[uploadPerc,setUploadPerc]=useState(0);
   const[showView,setShowView]=useState(true);
   const semOfStudent = props.semester;
 
   const submitResult = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("id", props.id);
-    formData.append("title", title);
-    formData.append("result", result);
-    formData.append("status",status)
+    await uploadPDF(result);    
+  };
 
+  const uploadPDF=async(file)=>{
+    const storage = getStorage(app);
+    const metadata = {
+      contentType: 'application/pdf'
+    };
+    console.log(file)
+    const fileName=new Date().getTime()+file.name;
+    const storageRef = ref(storage, 'files/' + fileName);
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+    uploadTask.on('state_changed',
+  (snapshot) => {
 
+    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    console.log('Upload is ' + progress + '% done');
+    setUploadPerc(Math.round(progress));
+    switch (snapshot.state) {
+      case 'paused':
+        console.log('Upload is paused');
+        break;
+      case 'running':
+        console.log('Upload is running');
+        break;
+    }
+  }, 
+  (error) => {
+    switch (error.code) {
+      case 'storage/unauthorized':
+        console.log(error);
+        break;
+      case 'storage/canceled':
+        break;
+      case 'storage/unknown':
+        break;
+        default:
+          break;
+    }
+  }, 
+  () => {
+    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+      console.log('File available at', downloadURL);
+      setResult(downloadURL);
+      handlePostReq(downloadURL);
+    });
+  }
+);
+  }
+  const handlePostReq=async(url)=>{
+  const details={
+    id: props.id,
+    title: title,
+    result: url,
+    status:status
+
+  }
     const response = await axios.post(
       "http://localhost:8080/api/uploadResult",
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
+     details
     );
     console.log(response);
     if (response) {
@@ -39,16 +89,15 @@ function Cards(props) {
       setShowView(true)
      
     }
-    
-  };
+  }
 
   const viewResult = async () => {
-    
-    const pdfURL = props.resultList.find((obj) => obj.Title === semOfStudent);
+    console.log(semOfStudent);
+    const pdfURL = await props.resultList.find((obj) => obj.Title === semOfStudent);
     console.log(pdfURL);
     console.log(pdfURL.Result);
     window.open(
-      "http://localhost:8080/files/" + pdfURL.Result,
+      pdfURL.Result,
       "_blank",
       "noreferrer"
     );

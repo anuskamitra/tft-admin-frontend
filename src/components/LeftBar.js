@@ -14,6 +14,7 @@ import { RiFilePaper2Line } from "react-icons/ri";
 
 
 function LeftBar(props) {
+  console.log("-------"+process.env)
   const dispatch=useDispatch()
   const Navigate=useNavigate();
  const[showAlumniYear,setShowAlumniYear]=useState(false);
@@ -153,6 +154,12 @@ console.log(loggedIn)
   }
 const handleHolidayShow=()=>{
   props.setShowHoliday(!props.showHoliday)
+  if(typeOfUser.type==="Student"){
+    props.setShowProfile(false);
+    props.setShowResult(false);
+    props.setShowQuestionPaper(false)
+  }
+  else{
   props.setShowStudentList(false);
   props.setShowCollegeList(false);
   props.setShowDepartmentList(false);
@@ -162,6 +169,9 @@ const handleHolidayShow=()=>{
   setShowAlumniYear(false);
   props.setChosenYear("");
   props.setShowQuestionPaper(false);
+  }
+ 
+ 
 }
 const handlePaperShow=()=>{
   console.log("hello")
@@ -215,7 +225,7 @@ useEffect(()=>{
          <div  className={`${Styles.list} `}>
          <div className={`${Styles.listItem} ps-3 ${props.showProfile && Styles.active}`} onClick={handleProfileShow}><i className="bi bi-person-circle ps-3"><span className={Styles.spanItem}>Profile</span></i></div>
          <div className={`${Styles.listItem} ps-3 ${props.showResult && Styles.active}`} onClick={handleResultShow}><i className="bi bi-file-earmark-text ps-3"><span className={Styles.spanItem}>Result</span></i></div>
-         <div className={`${Styles.listItem} ps-3 ${props.showHoliday && Styles.active}`} onClick={()=>props.setShowHoliday(!props.showHoliday)}><i className="ps-3"> <MdOutlineHolidayVillage/> <span className={Styles.spanItem}>holiday List</span></i></div>
+         <div className={`${Styles.listItem} ps-3 ${props.showHoliday && Styles.active}`} onClick={handleHolidayShow}><i className="ps-3"> <MdOutlineHolidayVillage/> <span className={Styles.spanItem}>holiday List</span></i></div>
         <div className={`${Styles.listItem} ps-3 ${props.showQuestionPaper && Styles.active}`} onClick={handleStudentPaperShow}><i className="ps-3"><RiFilePaper2Line /> <span className={Styles.spanItem}>Sample papers</span></i></div>
          <div className={`${Styles.navButton} ps-3`} onClick={handleLogout}><i className="bi bi-box-arrow-left ps-3 "><span className={`${Styles.spanItem}`}>Logout</span></i></div>
         </div>

@@ -26,6 +26,7 @@ function QuestionPapers() {
   const [chosenCollege, setChosenCollege] = useState("");
   const [showInputForm, setShowInputForm] = useState(false);
   const[chosenDepartmentName,setChosenDepartmentName]=useState("")
+  const [pDFPerc,setPDFPerc]=useState("");
   const [paper, setPaper] = useState("");
 
   const sem = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -63,6 +64,7 @@ function QuestionPapers() {
     }
   };
   const handleAddnewSubject = async () => {
+    
    let validationError=false;
    setError({});
     if(!subjectName){
@@ -74,31 +76,34 @@ function QuestionPapers() {
     if(!paper){
       setError((prev) => ({ ...prev, paper:"Uploadin PDF is required"}));
       // setError({...err,paper:"Uploadin PDF is required"})
+      
       validationError=true;
     }
-    if(!validationError){
-      console.log(subjectName)
-      console.log(paper)
-      console.log("done")
-    
-    const formData = new FormData();
-    formData.append("paper", paper);
-    formData.append("CollegeID", chosenCollege);
-    formData.append("DepartmentID", chosenDepartment);
-    formData.append("Semester", chosenSemester);
-    formData.append("SubjectName", subjectName);
 
-    const result = await axios.post(
-      backEndURL + "/samplePaper/addPaper",
-      formData
-    );
-    if (result) {
-      getSubjectList();
-      setShowInputForm(false);
-      setPaper("");
-      setSubjectName("");
-    }
+    if(!validationError){
+    await uploadPDF(paper); 
+    console.log(paper)
   };
+}
+
+const handlePostReq=async(url)=>{
+  const details={
+    PDF: url,
+    CollegeID: chosenCollege,
+    DepartmentID: chosenDepartment,
+    Semester: chosenSemester,
+    SubjectName: subjectName
+  }
+  const result = await axios.post(
+    backEndURL + "/samplePaper/addPaper",
+   details
+  );
+  if (result) {
+    getSubjectList();
+    setShowInputForm(false);
+    setPaper("");
+    setSubjectName("");
+  }
 }
 
   const handleShowSubjectList = async (s) => {
@@ -163,7 +168,63 @@ function QuestionPapers() {
     getCollege();
     }
   }, []);
- 
+  const uploadPDF=async(file)=>{
+    const storage = getStorage(app);
+    const metadata = {
+      contentType: 'application/pdf'
+    };
+    console.log(file)
+    const fileName=new Date().getTime()+file.name;
+    const storageRef = ref(storage, 'files/' + fileName);
+    const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+    uploadTask.on('state_changed',
+  (snapshot) => {
+
+    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+    console.log('Upload is ' + progress + '% done');
+    setPDFPerc(Math.round(progress));
+    switch (snapshot.state) {
+      case 'paused':
+        console.log('Upload is paused');
+        break;
+      case 'running':
+        console.log('Upload is running');
+        break;
+    }
+  }, 
+  (error) => {
+    // A full list of error codes is available at
+    // https://firebase.google.com/docs/storage/web/handle-errors
+    switch (error.code) {
+      case 'storage/unauthorized':
+        // User doesn't have permission to access the object
+        console.log(error);
+        break;
+      case 'storage/canceled':
+        // User canceled the upload
+        break;
+
+      // ...
+
+      case 'storage/unknown':
+        // Unknown error occurred, inspect error.serverResponse
+        break;
+        default:
+          break;
+    }
+  }, 
+  () => {
+    // Upload completed successfully, now we can get the download URL
+    getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+      console.log('File available at', downloadURL);
+      setPaper(downloadURL);
+      handlePostReq(downloadURL);
+    });
+  }
+);
+
+
+  }
 
   return (
     <div className="d-flex flex-column align-items-center">
@@ -256,12 +317,12 @@ function QuestionPapers() {
               />
               <InputController
               req={true}
-              label="Upload PDF"
+              label={pDFPerc}
                 type="file"
                 error={err.paper}
                 accept="application/pdf"
                 onChange={(e) => {
-                  setPaper(e.target.files[0]);
+                  setPaper(e.target.files[0])
                 }}
               />
                <div className="d-grid mt-2">

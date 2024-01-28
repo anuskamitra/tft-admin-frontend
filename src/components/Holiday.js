@@ -43,8 +43,8 @@ function Holiday() {
         );
         console.log(response.data.College._id);
            collegeId = response.data.College._id;
-      } else {
-         collegeId = loggedIn.collegeId;
+      } else  {
+         collegeId = typeOfUser.type === "College"?(typeOfUser.id): (loggedIn.collegeId);
         }
         console.log(collegeId);
         axios
@@ -52,7 +52,7 @@ function Holiday() {
           .then((response) => {
             console.log("called");
             console.log(response.data);
-            setHolidayList(response.data.Holidays);
+             setHolidayList(response.data.Holidays);
           });
       }
      catch (err) {
